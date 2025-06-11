@@ -1,0 +1,43 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "urn:projekt:order:details:v1",
+  "title": "Order Details",
+  "description": "Szczegóły zlecenia transportowego.",
+  "type": "object",
+  "properties": {
+    "orderId": { "type": "string", "format": "uuid" },
+    "status": { "type": "string", "enum": ["PENDING", "NEW", "PICKUP", "PSIP", "LOAD", "TERM", "POD"] },
+    "customer": { "type": "string" },
+    "addressFrom": { "type": "string" },
+    "addressTo": { "type": "string" },
+    "items": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "productCode": { "type": "string" },
+          "name": { "type": "string" },
+          "quantity": { "type": "number" },
+          "weight": { "type": "number" }
+        },
+        "required": ["productCode", "quantity"]
+      }
+    },
+    "priority": { "type": "string", "enum": ["NORMAL", "URGENT"] },
+    "timestamps": {
+      "type": "object",
+      "properties": {
+        "created": { "type": "string", "format": "date-time" },
+        "lastStatusChange": { "type": "string", "format": "date-time" }
+      },
+      "required": ["created"]
+    },
+    "assignedDriver": { "type": "string" },
+    "epod": {
+      "type": "array",
+      "items": { "$ref": "urn:projekt:order:epod:v1" }
+    }
+  },
+  "required": ["orderId", "status", "customer", "addressFrom", "addressTo", "items", "priority", "timestamps"],
+  "additionalProperties": false
+}

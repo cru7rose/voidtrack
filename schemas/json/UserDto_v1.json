@@ -1,0 +1,17 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "urn:projekt:user:details:v1",
+  "title": "User DTO",
+  "description": "DTO reprezentujący użytkownika systemu OMS.",
+  "type": "object",
+  "properties": {
+    "id": { "type": "string" },
+    "username": { "type": "string", "minLength": 3, "maxLength": 50 },
+    "role": { "type": "string" },
+    "passwordHash": { "type": "string" },
+    "lastPasswordChange": { "type": "string", "format": "date-time" },
+    "active": { "type": "boolean" }
+  },
+  "required": ["id", "username", "role", "passwordHash", "lastPasswordChange", "active"],
+  "additionalProperties": false
+}

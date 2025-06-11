@@ -1,0 +1,193 @@
+openapi: 3.0.3
+info:
+  title: Order & ePoD API
+  version: 1.0.0
+  description: >
+    REST API for Order Management and Electronic Proof of Delivery (ePoD) in OMS.
+servers:
+  - url: /api
+paths:
+  /orders:
+    post:
+      summary: Create new order
+      operationId: createOrder
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: './schemas/json/OrderDto_v1.json'
+      responses:
+        '201':
+          description: Order created
+          content:
+            application/json:
+              schema:
+                $ref: './schemas/json/OrderDto_v1.json'
+        '400':
+          description: Validation error
+          content:
+            application/json:
+              schema:
+                $ref: './schemas/json/ApiErrorDto_v1.json'
+    get:
+      summary: List orders
+      operationId: listOrders
+      parameters:
+        - in: query
+          name: status
+          schema:
+            type: string
+          description: Filter by order status
+        - in: query
+          name: customer
+          schema:
+            type: string
+          description: Filter by customer
+        - in: query
+          name: page
+          schema:
+            type: integer
+          description: Page number
+        - in: query
+          name: size
+          schema:
+            type: integer
+          description: Page size
+      responses:
+        '200':
+          description: List of orders
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: './schemas/json/OrderDto_v1.json'
+  /orders/{orderId}:
+    get:
+      summary: Get order details
+      operationId: getOrder
+      parameters:
+        - in: path
+          name: orderId
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Order details
+          content:
+            application/json:
+              schema:
+                $ref: './schemas/json/OrderDto_v1.json'
+        '404':
+          description: Order not found
+          content:
+            application/json:
+              schema:
+                $ref: './schemas/json/ApiErrorDto_v1.json'
+    patch:
+      summary: Update order status
+      operationId: updateOrderStatus
+      parameters:
+        - in: path
+          name: orderId
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                status:
+                  type: string
+                  enum: [PENDING, NEW, PICKUP, PSIP, LOAD, TERM, POD]
+      responses:
+        '200':
+          description: Order updated
+          content:
+            application/json:
+              schema:
+                $ref: './schemas/json/OrderDto_v1.json'
+        '400':
+          description: Validation error
+          content:
+            application/json:
+              schema:
+                $ref: './schemas/json/ApiErrorDto_v1.json'
+        '404':
+          description: Order not found
+          content:
+            application/json:
+              schema:
+                $ref: './schemas/json/ApiErrorDto_v1.json'
+  /orders/{orderId}/epod:
+    post:
+      summary: Add ePoD to order
+      operationId: addEpod
+      parameters:
+        - in: path
+          name: orderId
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: './schemas/json/EPodDto_v1.json'
+      responses:
+        '201':
+          description: ePoD added
+          content:
+            application/json:
+              schema:
+                $ref: './schemas/json/EPodDto_v1.json'
+        '400':
+          description: Validation error
+          content:
+            application/json:
+              schema:
+                $ref: './schemas/json/ApiErrorDto_v1.json'
+        '404':
+          description: Order not found
+          content:
+            application/json:
+              schema:
+                $ref: './schemas/json/ApiErrorDto_v1.json'
+    get:
+      summary: Get ePoDs for order
+      operationId: getEpods
+      parameters:
+        - in: path
+          name: orderId
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: List of ePoDs
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: './schemas/json/EPodDto_v1.json'
+        '404':
+          description: Order not found
+          content:
+            application/json:
+              schema:
+                $ref: './schemas/json/ApiErrorDto_v1.json'
+components:
+  schemas:
+    OrderDto:
+      $ref: './schemas/json/OrderDto_v1.json'
+    EPodDto:
+      $ref: './schemas/json/EPodDto_v1.json'
+    ApiErrorDto:
+      $ref: './schemas/json/ApiErrorDto_v1.json'

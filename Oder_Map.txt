@@ -1,0 +1,61 @@
+1. Pickup (Dane nadawcy / miejsca nadania)
+Pole w UI	Opis / Przeznaczenie	Nazwa w OMS/DTO	Typ	Uwagi
+Customer	Klient/nadawca	pickupCustomer	string	ID lub nazwa klienta
+Alias	Alias punktu/klienta	pickupAlias	string	Identyfikator aliasu adresu
+Country	Kraj	pickupCountry	string	Kod ISO-3166-1 alpha-2
+AdrID	ID adresu (wew. systemu)	pickupAddressId	int	Klucz główny adresu w bazie
+Post No.	Kod pocztowy	pickupPostalCode	string	Format: XX-XXX
+City	Miasto	pickupCity	string	
+Street	Ulica	pickupStreet	string	
+No.	Numer	pickupStreetNumber	string	
+Name	Nazwa (punktu/magazynu?)	pickupName	string	Pole opcjonalne, do etykiety
+Attention	Dodatkowa etykieta	pickupAttention	string	np. “do odbioru przez”
+Route	Trasa	pickupRoute	string	Jeśli dotyczy wybranego planowania
+Route Part	Segment trasy	pickupRoutePart	string	np. F (First leg)
+Type	Typ punktu	pickupType	string	F = From (nadanie)
+Manifest Date	Data manifestu (plan nadania)	pickupManifestDate	date	Data planowana na nadanie
+Pickup From / To	Okno czasowe nadania	pickupWindowFrom / To	datetime	Okres, w którym paczka ma być odebrana
+Mail	Email	pickupMail	string	Kontakt opcjonalny
+Phone	Telefon	pickupPhone	string	Kontakt opcjonalny
+Note	Notatka	pickupNote	string	Dowolny opis
+
+2. Delivery (Dane odbiorcy / miejsca dostawy)
+Pole w UI	Opis / Przeznaczenie	Nazwa w OMS/DTO	Typ	Uwagi
+Customer	Klient/odbiorca	deliveryCustomer	string	ID lub nazwa klienta
+Alias	Alias punktu/klienta	deliveryAlias	string	Identyfikator aliasu adresu
+Country	Kraj	deliveryCountry	string	Kod ISO-3166-1 alpha-2
+AdrID	ID adresu (wew. systemu)	deliveryAddressId	int	Klucz główny adresu
+Post No.	Kod pocztowy	deliveryPostalCode	string	Format: XX-XXX
+City	Miasto	deliveryCity	string	
+Street	Ulica	deliveryStreet	string	
+No.	Numer	deliveryStreetNumber	string	
+Name	Nazwa (punktu/magazynu?)	deliveryName	string	Pole opcjonalne, do etykiety
+Attention	Dodatkowa etykieta	deliveryAttention	string	np. “do odbioru przez”
+Route	Trasa	deliveryRoute	string	Jeśli dotyczy wybranego planowania
+Route Part	Segment trasy	deliveryRoutePart	string	D (Delivery leg)
+Type	Typ punktu	deliveryType	string	D = Delivery
+Manifest Date	Data manifestu (plan dostawy)	deliveryManifestDate	date	Data planowana na dostawę
+SLA	Okno czasowe SLA	deliverySLA	datetime	Czas gwarantowanej dostawy
+Delivery From / To	Okno czasowe dostawy	deliveryWindowFrom / To	datetime	
+Mail	Email	deliveryMail	string	Kontakt opcjonalny
+Phone	Telefon	deliveryPhone	string	Kontakt opcjonalny
+Note	Notatka	deliveryNote	string	Dowolny opis
+
+3. Additional (Informacje o przesyłce i paczkach)
+Pole w UI	Opis / Przeznaczenie	Nazwa w OMS/DTO	Typ	Uwagi
+Barcode 1	Kod kreskowy (główny)	barcode1	string	Unikalny kod przesyłki/paczki
+Barcode 2	Kod kreskowy (zapasowy)	barcode2	string	Opcjonalny
+Colli	Liczba paczek	colli	int	Ilość paczek
+Weight	Waga	weight	decimal	Waga przesyłki/paczki
+Volume	Objętość	volume	decimal	Objętość przesyłki/paczki
+KM	Kilometry	routeDistance	decimal	Długość trasy (opcjonalnie)
+Service Type	Typ usługi	serviceType	string	Np. standard, express, ADR...
+Change Wgt/Volume	Wymiary paczki	packageDimensions	object	Patrz niżej
+- Length	Długość	length	decimal	
+- Width	Szerokość	width	decimal	
+- Height	Wysokość	height	decimal	
+DriverInfo	Uwagi dla kierowcy	driverNote	string	Pole tekstowe
+InvoiceInfo	Informacje o fakturze	invoiceNote	string	Faktura dołączona / warunki rozlicz.
+Price	Cena	price	decimal	
+Currency	Waluta	currency	string	Kod waluty ISO
+ADR (checkbox/ikona)	Towar niebezpieczny ADR	adr	boolean	true/false
