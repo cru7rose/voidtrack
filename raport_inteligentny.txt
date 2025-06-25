@@ -4484,16 +4484,13 @@ package com.voidtracker.oms.order.dto;
 
 import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
-import java.nio.file.Files;
-import java.nio.file.Paths;
-import java.nio.file.Path;
+
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.junit.jupiter.api.Assumptions;
 
 class AllOrderDtoContractTests {
     @Test
     void orderDtoContract() throws Exception {
-        try (var is = getClass().getClassLoader().getResourceAsStream("schemas/json/example/OrderDto_example.json")) {
+        try (var is = getClass().getClassLoader().getResourceAsStream("schemas/example/OrderDto_example.json")) {
             assertNotNull(is, "Example JSON file not found in classpath");
             String exampleJson = new String(is.readAllBytes(), java.nio.charset.StandardCharsets.UTF_8);
             ObjectMapper mapper = new ObjectMapper();
@@ -4516,7 +4513,7 @@ class AllOrderDtoContractTests {
 
     @Test
     void createOrderRequestDtoContract() throws Exception {
-        try (var is = getClass().getClassLoader().getResourceAsStream("schemas/json/example/CreateOrderRequestDto_example.json")) {
+        try (var is = getClass().getClassLoader().getResourceAsStream("schemas/example/CreateOrderRequestDto_example.json")) {
             assertNotNull(is, "Example JSON file not found in classpath");
             String exampleJson = new String(is.readAllBytes(), java.nio.charset.StandardCharsets.UTF_8);
             ObjectMapper mapper = new ObjectMapper();
@@ -4536,7 +4533,7 @@ class AllOrderDtoContractTests {
 
     @Test
     void orderConfirmationResponseDtoContract() throws Exception {
-        try (var is = getClass().getClassLoader().getResourceAsStream("schemas/json/example/OrderConfirmationResponseDto_example.json")) {
+        try (var is = getClass().getClassLoader().getResourceAsStream("schemas/example/OrderConfirmationResponseDto_example.json")) {
             assertNotNull(is, "Example JSON file not found in classpath");
             String exampleJson = new String(is.readAllBytes(), java.nio.charset.StandardCharsets.UTF_8);
             ObjectMapper mapper = new ObjectMapper();
@@ -4554,7 +4551,7 @@ class AllOrderDtoContractTests {
 
     @Test
     void epodDtoContract() throws Exception {
-        try (var is = getClass().getClassLoader().getResourceAsStream("schemas/json/example/ePoDDto_example.json")) {
+        try (var is = getClass().getClassLoader().getResourceAsStream("schemas/example/ePoDDto_example.json")) {
             assertNotNull(is, "Example JSON file not found in classpath");
             String exampleJson = new String(is.readAllBytes(), java.nio.charset.StandardCharsets.UTF_8);
             ObjectMapper mapper = new ObjectMapper();
@@ -4577,17 +4574,15 @@ class AllOrderDtoContractTests {
 package com.voidtracker.oms.order.dto;
 
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.Assumptions;
+
 import static org.junit.jupiter.api.Assertions.*;
-import java.nio.file.Files;
-import java.nio.file.Paths;
-import java.nio.file.Path;
+
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 class CreateOrderRequestDtoContractTest {
     @Test
     void createOrderRequestDtoExampleShouldMatchSchema() throws Exception {
-        try (var is = getClass().getClassLoader().getResourceAsStream("schemas/json/example/CreateOrderRequestDto_example.json")) {
+        try (var is = getClass().getClassLoader().getResourceAsStream("schemas/example/CreateOrderRequestDto_example.json")) {
             assertNotNull(is, "Example JSON file not found in classpath");
             String exampleJson = new String(is.readAllBytes(), java.nio.charset.StandardCharsets.UTF_8);
             ObjectMapper mapper = new ObjectMapper();
@@ -4604,17 +4599,15 @@ class CreateOrderRequestDtoContractTest {
 package com.voidtracker.oms.order.dto;
 
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.Assumptions;
+
 import static org.junit.jupiter.api.Assertions.*;
-import java.nio.file.Files;
-import java.nio.file.Paths;
-import java.nio.file.Path;
+
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 class CreateOrderRequestDtoRoundTripTest {
     @Test
     void createOrderRequestDtoShouldSerializeAndDeserializeRoundTrip() throws Exception {
-        try (var is = getClass().getClassLoader().getResourceAsStream("schemas/json/example/CreateOrderRequestDto_example.json")) {
+        try (var is = getClass().getClassLoader().getResourceAsStream("schemas/example/CreateOrderRequestDto_example.json")) {
             assertNotNull(is, "Example JSON file not found in classpath");
             String exampleJson = new String(is.readAllBytes(), java.nio.charset.StandardCharsets.UTF_8);
             ObjectMapper mapper = new ObjectMapper();
@@ -4632,17 +4625,15 @@ class CreateOrderRequestDtoRoundTripTest {
 package com.voidtracker.oms.order.dto;
 
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.Assumptions;
+
 import static org.junit.jupiter.api.Assertions.*;
-import java.nio.file.Files;
-import java.nio.file.Paths;
-import java.nio.file.Path;
+
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 class EpodDtoContractTest {
     @Test
     void epodDtoExampleShouldMatchSchema() throws Exception {
-        try (var is = getClass().getClassLoader().getResourceAsStream("schemas/json/example/ePoDDto_example.json")) {
+        try (var is = getClass().getClassLoader().getResourceAsStream("schemas/example/ePoDDto_example.json")) {
             assertNotNull(is, "Example JSON file not found in classpath");
             String exampleJson = new String(is.readAllBytes(), java.nio.charset.StandardCharsets.UTF_8);
             ObjectMapper mapper = new ObjectMapper();
@@ -4659,17 +4650,15 @@ class EpodDtoContractTest {
 package com.voidtracker.oms.order.dto;
 
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.Assumptions;
+
 import static org.junit.jupiter.api.Assertions.*;
-import java.nio.file.Files;
-import java.nio.file.Paths;
-import java.nio.file.Path;
+
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 class EpodDtoRoundTripTest {
     @Test
     void epodDtoShouldSerializeAndDeserializeRoundTrip() throws Exception {
-        try (var is = getClass().getClassLoader().getResourceAsStream("schemas/json/example/ePoDDto_example.json")) {
+        try (var is = getClass().getClassLoader().getResourceAsStream("schema/example/ePoDDto_example.json")) {
             assertNotNull(is, "Example JSON file not found in classpath");
             String exampleJson = new String(is.readAllBytes(), java.nio.charset.StandardCharsets.UTF_8);
             ObjectMapper mapper = new ObjectMapper();
@@ -4864,17 +4853,15 @@ public class ExampleProductDetailsDtoFactory {
 package com.voidtracker.oms.order.dto;
 
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.Assumptions;
+
 import static org.junit.jupiter.api.Assertions.*;
-import java.nio.file.Files;
-import java.nio.file.Paths;
-import java.nio.file.Path;
+
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 class OrderConfirmationResponseDtoContractTest {
     @Test
     void orderConfirmationResponseDtoExampleShouldMatchSchema() throws Exception {
-        try (var is = getClass().getClassLoader().getResourceAsStream("schemas/json/example/OrderConfirmationResponseDto_example.json")) {
+        try (var is = getClass().getClassLoader().getResourceAsStream("schemas/example/OrderConfirmationResponseDto_example.json")) {
             assertNotNull(is, "Example JSON file not found in classpath");
             String exampleJson = new String(is.readAllBytes(), java.nio.charset.StandardCharsets.UTF_8);
             ObjectMapper mapper = new ObjectMapper();
@@ -4890,17 +4877,15 @@ class OrderConfirmationResponseDtoContractTest {
 package com.voidtracker.oms.order.dto;
 
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.Assumptions;
+
 import static org.junit.jupiter.api.Assertions.*;
-import java.nio.file.Files;
-import java.nio.file.Paths;
-import java.nio.file.Path;
+
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 class OrderConfirmationResponseDtoRoundTripTest {
     @Test
     void orderConfirmationResponseDtoShouldSerializeAndDeserializeRoundTrip() throws Exception {
-        try (var is = getClass().getClassLoader().getResourceAsStream("schemas/json/example/OrderConfirmationResponseDto_example.json")) {
+        try (var is = getClass().getClassLoader().getResourceAsStream("schemas/example/OrderConfirmationResponseDto_example.json")) {
             assertNotNull(is, "Example JSON file not found in classpath");
             String exampleJson = new String(is.readAllBytes(), java.nio.charset.StandardCharsets.UTF_8);
             ObjectMapper mapper = new ObjectMapper();
@@ -4917,17 +4902,15 @@ class OrderConfirmationResponseDtoRoundTripTest {
 package com.voidtracker.oms.order.dto;
 
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.Assumptions;
+
 import static org.junit.jupiter.api.Assertions.*;
-import java.nio.file.Files;
-import java.nio.file.Paths;
-import java.nio.file.Path;
+
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 class OrderDtoContractTest {
     @Test
     void orderDtoExampleShouldMatchSchema() throws Exception {
-        try (var is = getClass().getClassLoader().getResourceAsStream("schemas/json/example/OrderDto_example.json")) {
+        try (var is = getClass().getClassLoader().getResourceAsStream("schemas/example/OrderDto_example.json")) {
             assertNotNull(is, "Example JSON file not found in classpath");
             String exampleJson = new String(is.readAllBytes(), java.nio.charset.StandardCharsets.UTF_8);
             ObjectMapper mapper = new ObjectMapper();
@@ -4944,17 +4927,13 @@ class OrderDtoContractTest {
 package com.voidtracker.oms.order.dto;
 
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.Assumptions;
+
 import static org.junit.jupiter.api.Assertions.*;
-import java.nio.file.Files;
-import java.nio.file.Paths;
-import java.nio.file.Path;
-import com.fasterxml.jackson.databind.ObjectMapper;
 
 class OrderDtoExampleValidationTest {
     @Test
     void orderDtoExampleShouldContainAllRequiredFields() throws Exception {
-        try (var is = getClass().getClassLoader().getResourceAsStream("schemas/json/example/OrderDto_example.json")) {
+        try (var is = getClass().getClassLoader().getResourceAsStream("schemas/example/OrderDto_example.json")) {
             assertNotNull(is, "Example JSON file not found in classpath");
             String exampleJson = new String(is.readAllBytes(), java.nio.charset.StandardCharsets.UTF_8);
             assertTrue(exampleJson.contains("orderId"));
@@ -4981,17 +4960,15 @@ package com.voidtracker.oms.order.dto;
 package com.voidtracker.oms.order.dto;
 
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.Assumptions;
+
 import static org.junit.jupiter.api.Assertions.*;
-import java.nio.file.Files;
-import java.nio.file.Paths;
-import java.nio.file.Path;
+
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 class OrderDtoRoundTripTest {
     @Test
     void orderDtoShouldSerializeAndDeserializeRoundTrip() throws Exception {
-        try (var is = getClass().getClassLoader().getResourceAsStream("schemas/json/example/OrderDto_example.json")) {
+        try (var is = getClass().getClassLoader().getResourceAsStream("schemas/example/OrderDto_example.json")) {
             assertNotNull(is, "Example JSON file not found in classpath");
             String exampleJson = new String(is.readAllBytes(), java.nio.charset.StandardCharsets.UTF_8);
             ObjectMapper mapper = new ObjectMapper();

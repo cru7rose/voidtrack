@@ -9,7 +9,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 class EpodDtoContractTest {
     @Test
     void epodDtoExampleShouldMatchSchema() throws Exception {
-        try (var is = getClass().getClassLoader().getResourceAsStream("schema/example/ePoDDto_example.json")) {
+        try (var is = getClass().getClassLoader().getResourceAsStream("schemas/json/example/ePoDDto_example.json")) {
             assertNotNull(is, "Example JSON file not found in classpath");
             String exampleJson = new String(is.readAllBytes(), java.nio.charset.StandardCharsets.UTF_8);
             ObjectMapper mapper = new ObjectMapper();

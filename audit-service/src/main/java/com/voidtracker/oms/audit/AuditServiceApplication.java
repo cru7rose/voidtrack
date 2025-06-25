@@ -7,7 +7,9 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import org.springframework.context.annotation.Bean;
 
-@SpringBootApplication
+@SpringBootApplication(
+        scanBasePackages = {"com.voidtracker.oms.audit", "com.voidtracker.oms.commons"}
+)
 public class AuditServiceApplication {
     public static void main(String[] args) {
         SpringApplication.run(AuditServiceApplication.class, args);

@@ -8,7 +8,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 class AllOrderDtoContractTests {
     @Test
     void orderDtoContract() throws Exception {
-        try (var is = getClass().getClassLoader().getResourceAsStream("schema/example/OrderDto_example.json")) {
+        try (var is = getClass().getClassLoader().getResourceAsStream("schemas/json/example/OrderDto_example.json")) {
             assertNotNull(is, "Example JSON file not found in classpath");
             String exampleJson = new String(is.readAllBytes(), java.nio.charset.StandardCharsets.UTF_8);
             ObjectMapper mapper = new ObjectMapper();
@@ -31,7 +31,7 @@ class AllOrderDtoContractTests {
 
     @Test
     void createOrderRequestDtoContract() throws Exception {
-        try (var is = getClass().getClassLoader().getResourceAsStream("schema/example/CreateOrderRequestDto_example.json")) {
+        try (var is = getClass().getClassLoader().getResourceAsStream("schemas/json/example/CreateOrderRequestDto_example.json")) {
             assertNotNull(is, "Example JSON file not found in classpath");
             String exampleJson = new String(is.readAllBytes(), java.nio.charset.StandardCharsets.UTF_8);
             ObjectMapper mapper = new ObjectMapper();
@@ -51,7 +51,7 @@ class AllOrderDtoContractTests {
 
     @Test
     void orderConfirmationResponseDtoContract() throws Exception {
-        try (var is = getClass().getClassLoader().getResourceAsStream("schema/example/OrderConfirmationResponseDto_example.json")) {
+        try (var is = getClass().getClassLoader().getResourceAsStream("schemas/json/example/OrderConfirmationResponseDto_example.json")) {
             assertNotNull(is, "Example JSON file not found in classpath");
             String exampleJson = new String(is.readAllBytes(), java.nio.charset.StandardCharsets.UTF_8);
             ObjectMapper mapper = new ObjectMapper();
@@ -69,7 +69,7 @@ class AllOrderDtoContractTests {
 
     @Test
     void epodDtoContract() throws Exception {
-        try (var is = getClass().getClassLoader().getResourceAsStream("schema/example/ePoDDto_example.json")) {
+        try (var is = getClass().getClassLoader().getResourceAsStream("schemas/json/example/ePoDDto_example.json")) {
             assertNotNull(is, "Example JSON file not found in classpath");
             String exampleJson = new String(is.readAllBytes(), java.nio.charset.StandardCharsets.UTF_8);
             ObjectMapper mapper = new ObjectMapper();

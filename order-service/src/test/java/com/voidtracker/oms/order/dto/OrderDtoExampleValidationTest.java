@@ -7,7 +7,7 @@ import static org.junit.jupiter.api.Assertions.*;
 class OrderDtoExampleValidationTest {
     @Test
     void orderDtoExampleShouldContainAllRequiredFields() throws Exception {
-        try (var is = getClass().getClassLoader().getResourceAsStream("schema/example/OrderDto_example.json")) {
+        try (var is = getClass().getClassLoader().getResourceAsStream("schemas/json/example/OrderDto_example.json")) {
             assertNotNull(is, "Example JSON file not found in classpath");
             String exampleJson = new String(is.readAllBytes(), java.nio.charset.StandardCharsets.UTF_8);
             assertTrue(exampleJson.contains("orderId"));

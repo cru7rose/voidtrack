@@ -9,7 +9,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 class CreateOrderRequestDtoRoundTripTest {
     @Test
     void createOrderRequestDtoShouldSerializeAndDeserializeRoundTrip() throws Exception {
-        try (var is = getClass().getClassLoader().getResourceAsStream("schema/example/CreateOrderRequestDto_example.json")) {
+        try (var is = getClass().getClassLoader().getResourceAsStream("schemas/json/example/CreateOrderRequestDto_example.json")) {
             assertNotNull(is, "Example JSON file not found in classpath");
             String exampleJson = new String(is.readAllBytes(), java.nio.charset.StandardCharsets.UTF_8);
             ObjectMapper mapper = new ObjectMapper();
