@@ -1,0 +1,16 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "urn:projekt:user:details:v1",
+  "title": "UserDto",
+  "description": "Szczegóły użytkownika systemu OMS",
+  "type": "object",
+  "properties": {
+    "id": { "type": "string", "format": "uuid" },
+    "username": { "type": "string" },
+    "role": { "type": "string" },
+    "passwordHash": { "type": "string" },
+    "lastPasswordChange": { "type": "string", "format": "date-time" },
+    "active": { "type": "boolean" }
+  },
+  "required": ["id", "username", "role", "passwordHash", "active"]
+}

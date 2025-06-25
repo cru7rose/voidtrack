@@ -1,0 +1,16 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Order List Item",
+  "type": "object",
+  "properties": {
+    "orderId": { "type": "string" },
+    "status": { "type": "string", "enum": ["PENDING", "NEW", "PICKUP", "PSIP", "LOAD", "TERM", "POD"] },
+    "priority": { "type": "string", "enum": ["NORMAL", "URGENT"] },
+    "customer": { "type": "string" },
+    "cityFrom": { "type": "string" },
+    "cityTo": { "type": "string" },
+    "created": { "type": "string", "format": "date-time" },
+    "assignedDriver": { "type": ["string", "null"] }
+  },
+  "required": ["orderId", "status", "priority", "customer", "cityFrom", "cityTo", "created"]
+}

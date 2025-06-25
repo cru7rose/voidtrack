@@ -1,52 +1,38 @@
 package com.voidtracker.oms.order.service;
 
-import com.voidtracker.oms.commons.dto.OrderDto;
-import com.voidtracker.oms.commons.dto.EPodDto;
-import org.springframework.stereotype.Service;
+import com.voidtracker.oms.order.dto.*;
+import org.springframework.http.ResponseEntity;
+import java.util.List;
+import java.util.Optional;
 
-import java.util.*;
+/**
+ * Service for order business logic. Handles sync/async creation, status changes, soft-delete, and filtering.
+ *
+ * Order creation mode (sync/async) is determined by customer config (see admin panel).
+ */
+public interface OrderService {
+    /**
+     * Create or queue an order based on customer config.
+     */
+    ResponseEntity<?> createOrQueueOrder(CreateOrderRequestDto request, String custId);
 
-@Service
-public class OrderService {
-    private final Map<String, OrderDto> orders = new HashMap<>();
-    private final Map<String, List<EPodDto>> epods = new HashMap<>();
+    /**
+     * List/search orders with filtering and pagination.
+     */
+    List<OrderListItemDto> listOrders(OrderSearchCriteria criteria);
 
-    public OrderDto createOrder(OrderDto orderDto) {
-        orders.put(orderDto.getOrderId(), orderDto);
-        return orderDto;
-    }
+    /**
+     * Get order details.
+     */
+    Optional<OrderDto> getOrder(String orderId);
 
-    public List<OrderDto> listOrders() {
-        return new ArrayList<>(orders.values());
-    }
+    /**
+     * Change order status (e.g., delivery confirmation).
+     */
+    ResponseEntity<?> changeOrderStatus(String orderId, OrderStatusChangeRequestDto request);
 
-    public Optional<OrderDto> getOrder(String orderId) {
-        return Optional.ofNullable(orders.get(orderId));
-    }
-
-    public Optional<OrderDto> updateOrderStatus(String orderId, String status) {
-        OrderDto order = orders.get(orderId);
-        if (order == null) return Optional.empty();
-        order.setStatus(status);
-        if (order.getTimestamps() != null) {
-            order.getTimestamps().setLastStatusChange(java.time.Instant.now().toString());
-        }
-        return Optional.of(order);
-    }
-
-    public Optional<EPodDto> addEpod(String orderId, EPodDto epodDto) {
-        OrderDto order = orders.get(orderId);
-        if (order == null) return Optional.empty();
-        epods.computeIfAbsent(orderId, k -> new ArrayList<>()).add(epodDto);
-        // Dodaj ePoD do listy w OrderDto
-        if (order.getEpod() == null) {
-            order.setEpod(new ArrayList<>());
-        }
-        order.getEpod().add(epodDto);
-        return Optional.of(epodDto);
-    }
-
-    public List<EPodDto> getEpods(String orderId) {
-        return epods.getOrDefault(orderId, Collections.emptyList());
-    }
+    /**
+     * Soft-delete an order.
+     */
+    void softDeleteOrder(String orderId);
 }

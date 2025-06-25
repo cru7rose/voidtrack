@@ -1,24 +1,27 @@
 package com.voidtracker.oms.audit.service;
 
-import com.voidtracker.oms.commons.dto.AuditDto;
+import com.voidtracker.oms.audit.dto.AuditDto;
+import com.voidtracker.oms.audit.repository.AuditRepository;
 import org.springframework.stereotype.Service;
-
 import java.util.*;
 
 @Service
 public class AuditService {
-    private final Map<String, AuditDto> events = new HashMap<>();
+    private final AuditRepository auditRepository;
 
-    public AuditDto registerEvent(AuditDto auditDto) {
-        events.put(auditDto.getId(), auditDto);
-        return auditDto;
+    public AuditService(AuditRepository auditRepository) {
+        this.auditRepository = auditRepository;
     }
 
-    public Optional<AuditDto> getEvent(String id) {
-        return Optional.ofNullable(events.get(id));
+    public List<AuditDto> listAuditEvents() {
+        return auditRepository.findAll();
     }
 
-    public List<AuditDto> listEvents() {
-        return new ArrayList<>(events.values());
+    public AuditDto getAuditEvent(String auditId) {
+        return auditRepository.findById(auditId).orElse(null);
+    }
+
+    public AuditDto createAuditEvent(AuditDto event) {
+        return auditRepository.save(event);
     }
 }

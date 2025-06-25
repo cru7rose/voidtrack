@@ -1,0 +1,8 @@
+{
+  "id": "epod-001",
+  "orderId": "a1b2c3d4-e5f6-7890-1234-567890abcdef",
+  "signature": "base64signature==",
+  "photos": ["base64photo1==", "base64photo2=="],
+  "timestamp": "2024-06-10T09:30:00Z",
+  "userId": "john_doe"
+}

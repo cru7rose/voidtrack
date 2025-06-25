@@ -1,0 +1,6 @@
+{
+  "id": "user-001",
+  "username": "john_doe",
+  "role": "admin",
+  "active": true
+}

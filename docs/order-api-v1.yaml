@@ -1,0 +1,185 @@
+openapi: 3.0.3
+info:
+  title: VoidTracker Order API
+  version: 1.0.0
+  description: |
+    Core Order Management API for VoidTracker OMS. All endpoints use versioned DTOs and strict JSON Schema validation.
+    Security: JWT (roles: ADMIN, USER, COURIER/DRIVER). See documentation for role mapping.
+    Order creation supports both synchronous and asynchronous modes (per customer config).
+servers:
+  - url: /api/v1
+security:
+  - bearerAuth: []
+paths:
+  /orders:
+    post:
+      summary: Create a new order
+      description: |
+        Creates a new order. Mode (sync/async) is determined by customer configuration.
+        - ADMIN/USER: can create orders for their customerId.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateOrderRequestDto'
+      responses:
+        '201':
+          description: Order created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OrderConfirmationResponseDto'
+        '202':
+          description: Order accepted for async processing
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OrderConfirmationResponseDto'
+        '400':
+          description: Validation error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorDto'
+        '500':
+          description: Integration failure
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorDto'
+    get:
+      summary: List/search orders
+      description: |
+        Returns a paginated list of orders. Supports filtering by address, barcode, customer fields (alias, custId, etc.).
+        - ADMIN: can search all orders.
+        - USER: can search their own orders.
+      parameters:
+        - in: query
+          name: address
+          schema: { type: string }
+        - in: query
+          name: barcode
+          schema: { type: string }
+        - in: query
+          name: custId
+          schema: { type: string }
+        - in: query
+          name: alias
+          schema: { type: string }
+        - in: query
+          name: page
+          schema: { type: integer, default: 0 }
+        - in: query
+          name: size
+          schema: { type: integer, default: 20 }
+      responses:
+        '200':
+          description: Paginated list of orders
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/OrderListItemDto'
+  /orders/{orderId}:
+    get:
+      summary: Get order details
+      description: |
+        Returns details for a specific order. Soft-deleted orders are only visible to ADMIN.
+      parameters:
+        - in: path
+          name: orderId
+          required: true
+          schema: { type: string }
+      responses:
+        '200':
+          description: Order details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OrderDto'
+        '404':
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorDto'
+    patch:
+      summary: Change order status
+      description: |
+        Updates the status of an order (e.g., delivery confirmation, scanning). Only COURIER/DRIVER or ADMIN can change status.
+      parameters:
+        - in: path
+          name: orderId
+          required: true
+          schema: { type: string }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/OrderStatusChangeRequestDto'
+      responses:
+        '200':
+          description: Status updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OrderDto'
+        '400':
+          description: Validation error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorDto'
+        '404':
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorDto'
+  /orders/{orderId}/soft-delete:
+    post:
+      summary: Soft-delete an order
+      description: |
+        Marks an order as deleted (soft-delete). Only ADMIN can perform this action.
+      parameters:
+        - in: path
+          name: orderId
+          required: true
+          schema: { type: string }
+      responses:
+        '204':
+          description: Order soft-deleted
+        '404':
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorDto'
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+  schemas:
+    CreateOrderRequestDto: { $ref: '../order-service/src/test/resources/schemas/json/json/CreateOrderRequestDto_v1.json' }
+    OrderConfirmationResponseDto: { $ref: '../order-service/src/test/resources/schemas/json/json/OrderConfirmationResponseDto_v1.json' }
+    OrderDto: { $ref: '../order-service/src/test/resources/schemas/json/json/OrderDto_v1.json' }
+    OrderListItemDto: { $ref: '../order-service/src/test/resources/schemas/json/json/OrderListItem_v1.json' }
+    OrderStatusChangeRequestDto:
+      type: object
+      required: [status, timestamp, scannedBy]
+      properties:
+        status:
+          type: string
+          description: New order status (e.g., DELIVERED, CANCELLED, etc.)
+        timestamp:
+          type: string
+          format: date-time
+        scannedBy:
+          type: string
+          description: Courier/driver/user who performed the status change
+    ApiErrorDto: { $ref: '../order-service/src/test/resources/schemas/json/json/ApiError_v1.json' }

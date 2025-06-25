@@ -1,0 +1,73 @@
+{
+  "orderId": "a1b2c3d4-e5f6-7890-1234-567890abcdef",
+  "status": "PICKUP",
+  "priority": "URGENT",
+  "pickup": {
+    "customer": "DANXILS Sp. z o.o.",
+    "alias": "WAW-CENTRAL",
+    "country": "PL",
+    "addressId": 101,
+    "postalCode": "00-001",
+    "city": "Warszawa",
+    "street": "Logistyczna",
+    "streetNumber": "12A",
+    "name": "Magazyn Centralny",
+    "attention": "Odbiór przez kierowcę X",
+    "route": "WAW-POZ",
+    "routePart": "F",
+    "type": "FROM",
+    "manifestDate": "2024-06-10",
+    "windowFrom": "2024-06-10T08:00:00Z",
+    "windowTo": "2024-06-10T09:00:00Z",
+    "mail": "magazyn@danxils.com",
+    "phone": "+48221234567",
+    "note": "Załadunek na rampie 3"
+  },
+  "delivery": {
+    "customer": "Serwis Poznań",
+    "alias": "POZ-SERWIS",
+    "country": "PL",
+    "addressId": 202,
+    "postalCode": "60-101",
+    "city": "Poznań",
+    "street": "Przemysłowa",
+    "streetNumber": "1",
+    "name": "Serwis Główny",
+    "attention": "Dostawa do rąk własnych",
+    "route": "WAW-POZ",
+    "routePart": "D",
+    "type": "DELIVERY",
+    "manifestDate": "2024-06-10",
+    "sla": "2024-06-10T12:00:00Z",
+    "windowFrom": "2024-06-10T10:00:00Z",
+    "windowTo": "2024-06-10T12:00:00Z",
+    "mail": "serwis@danxils.com",
+    "phone": "+48601234567",
+    "note": "Dostawa na bramę serwisową"
+  },
+  "package": {
+    "barcode1": "PLDANX1234567890",
+    "barcode2": "PLDANX0987654321",
+    "colli": 2,
+    "weight": 15.5,
+    "volume": 0.12,
+    "routeDistance": 310.0,
+    "serviceType": "express",
+    "packageDimensions": {
+      "length": 80.0,
+      "width": 60.0,
+      "height": 40.0
+    },
+    "driverNote": "Uwaga na delikatny ładunek",
+    "invoiceNote": "Faktura dołączona do przesyłki",
+    "price": 350.00,
+    "currency": "PLN",
+    "adr": false
+  },
+  "timestamps": {
+    "created": "2024-06-10T07:30:00Z",
+    "lastStatusChange": "2024-06-10T08:05:00Z"
+  },
+  "assignedDriver": "john_doe",
+  "epod": []
+}

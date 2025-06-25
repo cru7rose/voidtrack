@@ -1,0 +1,14 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "ApiErrorDto",
+  "description": "Standardowy format błędu API",
+  "type": "object",
+  "properties": {
+    "errorCode": { "type": "string" },
+    "message": { "type": "string" },
+    "details": { "type": "string" },
+    "correlationId": { "type": "string", "description": "Correlation ID for tracing" },
+    "timestamp": { "type": "string", "format": "date-time", "description": "Error occurrence time" }
+  },
+  "required": ["errorCode", "message"]
+}

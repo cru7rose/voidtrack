@@ -1,0 +1,28 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Vehicle",
+  "type": "object",
+  "properties": {
+    "vehicleId": { "type": "string" },
+    "registrationNumber": { "type": "string" },
+    "type": { "type": "string" },
+    "brand": { "type": "string" },
+    "model": { "type": "string" },
+    "capacityKg": { "type": "number" },
+    "dimensions": {
+      "type": "object",
+      "properties": {
+        "length": { "type": "number" },
+        "width": { "type": "number" },
+        "height": { "type": "number" }
+      },
+      "required": ["length", "width", "height"]
+    },
+    "status": { "type": "string", "enum": ["available", "in_use", "maintenance", "unavailable"] },
+    "lastInspection": { "type": "string", "format": "date-time" },
+    "nextInspection": { "type": "string", "format": "date-time" },
+    "createdAt": { "type": "string", "format": "date-time" },
+    "updatedAt": { "type": "string", "format": "date-time" }
+  },
+  "required": ["vehicleId", "registrationNumber", "type", "capacityKg", "dimensions", "status", "createdAt"]
+}

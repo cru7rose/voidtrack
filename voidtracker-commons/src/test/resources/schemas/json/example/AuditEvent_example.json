@@ -1,0 +1,9 @@
+{
+  "eventId": "e1f2c3d4-5678-1234-9abc-1234567890ab",
+  "timestamp": "2024-06-10T12:05:00Z",
+  "userId": "john_doe",
+  "action": "UPDATE_STATUS",
+  "entityType": "Order",
+  "entityId": "a1b2c3d4-e5f6-7890-1234-567890abcdef",
+  "details": "Status zmieniony z PICKUP na LOAD przez użytkownika john_doe."
+}

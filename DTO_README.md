@@ -27,28 +27,90 @@
   "$schema": "http://json-schema.org/draft-07/schema#",
   "$id": "urn:projekt:order:details:v1",
   "title": "Order Details",
-  "description": "Szczegóły zlecenia transportowego.",
+  "description": "Szczegóły zlecenia transportowego (OMS/TMS)",
   "type": "object",
   "properties": {
     "orderId": { "type": "string", "format": "uuid" },
     "status": { "type": "string", "enum": ["PENDING", "NEW", "PICKUP", "PSIP", "LOAD", "TERM", "POD"] },
-    "customer": { "type": "string" },
-    "addressFrom": { "type": "string" },
-    "addressTo": { "type": "string" },
-    "items": {
-      "type": "array",
-      "items": {
-        "type": "object",
-        "properties": {
-          "productCode": { "type": "string" },
-          "name": { "type": "string" },
-          "quantity": { "type": "number" },
-          "weight": { "type": "number" }
-        },
-        "required": ["productCode", "quantity"]
-      }
-    },
     "priority": { "type": "string", "enum": ["NORMAL", "URGENT"] },
+    "pickup": {
+      "type": "object",
+      "properties": {
+        "customer": { "type": "string" },
+        "alias": { "type": "string" },
+        "country": { "type": "string", "pattern": "^[A-Z]{2}$" },
+        "addressId": { "type": "integer" },
+        "postalCode": { "type": "string", "pattern": "^\\d{2}-\\d{3}$" },
+        "city": { "type": "string" },
+        "street": { "type": "string" },
+        "streetNumber": { "type": "string" },
+        "name": { "type": "string" },
+        "attention": { "type": "string" },
+        "route": { "type": "string" },
+        "routePart": { "type": "string" },
+        "type": { "type": "string" },
+        "manifestDate": { "type": "string", "format": "date" },
+        "windowFrom": { "type": "string", "format": "date-time" },
+        "windowTo": { "type": "string", "format": "date-time" },
+        "mail": { "type": "string", "format": "email" },
+        "phone": { "type": "string" },
+        "note": { "type": "string" }
+      },
+      "required": ["customer", "country", "city", "street", "streetNumber", "postalCode"]
+    },
+    "delivery": {
+      "type": "object",
+      "properties": {
+        "customer": { "type": "string" },
+        "alias": { "type": "string" },
+        "country": { "type": "string", "pattern": "^[A-Z]{2}$" },
+        "addressId": { "type": "integer" },
+        "postalCode": { "type": "string", "pattern": "^\\d{2}-\\d{3}$" },
+        "city": { "type": "string" },
+        "street": { "type": "string" },
+        "streetNumber": { "type": "string" },
+        "name": { "type": "string" },
+        "attention": { "type": "string" },
+        "route": { "type": "string" },
+        "routePart": { "type": "string" },
+        "type": { "type": "string" },
+        "manifestDate": { "type": "string", "format": "date" },
+        "sla": { "type": "string", "format": "date-time" },
+        "windowFrom": { "type": "string", "format": "date-time" },
+        "windowTo": { "type": "string", "format": "date-time" },
+        "mail": { "type": "string", "format": "email" },
+        "phone": { "type": "string" },
+        "note": { "type": "string" }
+      },
+      "required": ["customer", "country", "city", "street", "streetNumber", "postalCode"]
+    },
+    "package": {
+      "type": "object",
+      "properties": {
+        "barcode1": { "type": "string" },
+        "barcode2": { "type": "string" },
+        "colli": { "type": "integer" },
+        "weight": { "type": "number" },
+        "volume": { "type": "number" },
+        "routeDistance": { "type": "number" },
+        "serviceType": { "type": "string" },
+        "packageDimensions": {
+          "type": "object",
+          "properties": {
+            "length": { "type": "number" },
+            "width": { "type": "number" },
+            "height": { "type": "number" }
+          },
+          "required": ["length", "width", "height"]
+        },
+        "driverNote": { "type": "string" },
+        "invoiceNote": { "type": "string" },
+        "price": { "type": "number" },
+        "currency": { "type": "string", "pattern": "^[A-Z]{3}$" },
+        "adr": { "type": "boolean" }
+      },
+      "required": ["barcode1", "colli", "weight", "serviceType"]
+    },
     "timestamps": {
       "type": "object",
       "properties": {
@@ -63,7 +125,7 @@
       "items": { "$ref": "urn:projekt:order:epod:v1" }
     }
   },
-  "required": ["orderId", "status", "customer", "addressFrom", "addressTo", "items", "priority", "timestamps"]
+  "required": ["orderId", "status", "priority", "pickup", "delivery", "package", "timestamps"]
 }
 ```
 
@@ -72,19 +134,84 @@
 {
   "orderId": "a1b2c3d4-e5f6-7890-1234-567890abcdef",
   "status": "PICKUP",
-  "customer": "DANXILS Sp. z o.o.",
-  "addressFrom": "Magazyn Centralny, Warszawa",
-  "addressTo": "Serwis, Poznań, ul. Przemysłowa 1",
-  "items": [
-    { "productCode": "ABC123", "name": "Pompa", "quantity": 2, "weight": 3.5 }
-  ],
   "priority": "URGENT",
+  "pickup": {
+    "customer": "DANXILS Sp. z o.o.",
+    "alias": "WAW-CENTRAL",
+    "country": "PL",
+    "addressId": 101,
+    "postalCode": "00-001",
+    "city": "Warszawa",
+    "street": "Logistyczna",
+    "streetNumber": "12A",
+    "name": "Magazyn Centralny",
+    "attention": "Odbiór przez kierowcę X",
+    "route": "WAW-POZ",
+    "routePart": "F",
+    "type": "FROM",
+    "manifestDate": "2024-06-10",
+    "windowFrom": "2024-06-10T08:00:00Z",
+    "windowTo": "2024-06-10T09:00:00Z",
+    "mail": "magazyn@danxils.com",
+    "phone": "+48221234567",
+    "note": "Załadunek na rampie 3"
+  },
+  "delivery": {
+    "customer": "Serwis Poznań",
+    "alias": "POZ-SERWIS",
+    "country": "PL",
+    "addressId": 202,
+    "postalCode": "60-101",
+    "city": "Poznań",
+    "street": "Przemysłowa",
+    "streetNumber": "1",
+    "name": "Serwis Główny",
+    "attention": "Dostawa do rąk własnych",
+    "route": "WAW-POZ",
+    "routePart": "D",
+    "type": "DELIVERY",
+    "manifestDate": "2024-06-10",
+    "sla": "2024-06-10T12:00:00Z",
+    "windowFrom": "2024-06-10T10:00:00Z",
+    "windowTo": "2024-06-10T12:00:00Z",
+    "mail": "serwis@danxils.com",
+    "phone": "+48601234567",
+    "note": "Dostawa na bramę serwisową"
+  },
+  "package": {
+    "barcode1": "PLDANX1234567890",
+    "barcode2": "PLDANX0987654321",
+    "colli": 2,
+    "weight": 15.5,
+    "volume": 0.12,
+    "routeDistance": 310.0,
+    "serviceType": "express",
+    "packageDimensions": {
+      "length": 80.0,
+      "width": 60.0,
+      "height": 40.0
+    },
+    "driverNote": "Uwaga na delikatny ładunek",
+    "invoiceNote": "Faktura dołączona do przesyłki",
+    "price": 350.00,
+    "currency": "PLN",
+    "adr": false
+  },
   "timestamps": {
-    "created": "2024-06-10T08:00:00Z",
-    "lastStatusChange": "2024-06-10T09:15:00Z"
+    "created": "2024-06-10T07:30:00Z",
+    "lastStatusChange": "2024-06-10T08:05:00Z"
   },
   "assignedDriver": "john_doe",
   "epod": []
+}
+```
+
+## 4a. Przykładowy payload (ApiErrorDto)
+```json
+{
+  "errorCode": "ORDER_NOT_FOUND",
+  "message": "Nie znaleziono zlecenia o podanym ID.",
+  "details": "orderId: a1b2c3d4-e5f6-7890-1234-567890abcdef"
 }
 ```
 

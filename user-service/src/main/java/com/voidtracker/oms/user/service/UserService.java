@@ -1,34 +1,35 @@
 package com.voidtracker.oms.user.service;
 
-import com.voidtracker.oms.commons.dto.UserDto;
+import com.voidtracker.oms.user.dto.UserProfileDto;
+import com.voidtracker.oms.user.repository.UserRepository;
 import org.springframework.stereotype.Service;
-
 import java.util.*;
 
 @Service
 public class UserService {
-    private final Map<String, UserDto> users = new HashMap<>();
+    private final UserRepository userRepository;
 
-    public UserDto createUser(UserDto userDto) {
-        users.put(userDto.getId(), userDto);
-        return userDto;
+    public UserService(UserRepository userRepository) {
+        this.userRepository = userRepository;
     }
 
-    public Optional<UserDto> getUser(String id) {
-        return Optional.ofNullable(users.get(id));
+    public List<UserProfileDto> listUsers() {
+        return userRepository.findAll();
     }
 
-    public List<UserDto> listUsers() {
-        return new ArrayList<>(users.values());
+    public UserProfileDto getUser(String id) {
+        return userRepository.findById(id).orElse(null);
     }
 
-    public Optional<UserDto> updateUser(String id, UserDto userDto) {
-        if (!users.containsKey(id)) return Optional.empty();
-        users.put(id, userDto);
-        return Optional.of(userDto);
+    public UserProfileDto createUser(UserProfileDto user) {
+        return userRepository.save(user);
     }
 
-    public boolean deleteUser(String id) {
-        return users.remove(id) != null;
+    public UserProfileDto updateUser(String id, UserProfileDto user) {
+        return userRepository.save(user);
+    }
+
+    public void deleteUser(String id) {
+        userRepository.deleteById(id);
     }
 }

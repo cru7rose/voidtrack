@@ -1,0 +1,19 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "urn:projekt:order:epod:v1",
+  "title": "Electronic Proof of Delivery (ePoD)",
+  "description": "Elektroniczne potwierdzenie dostawy (ePoD) - pełna produkcyjna struktura",
+  "type": "object",
+  "properties": {
+    "id": { "type": "string" },
+    "orderId": { "type": "string" },
+    "signature": { "type": "string" },
+    "photos": {
+      "type": "array",
+      "items": { "type": "string" }
+    },
+    "timestamp": { "type": "string", "format": "date-time" },
+    "userId": { "type": "string" }
+  },
+  "required": ["id", "orderId", "signature", "timestamp", "userId"]
+}

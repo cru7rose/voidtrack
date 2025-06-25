@@ -1,0 +1,51 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "urn:projekt:order:list:item:v1",
+  "title": "Order List Item",
+  "description": "Podstawowe informacje o zleceniu na potrzeby wyświetlania na liście.",
+  "type": "object",
+  "properties": {
+    "orderId": {
+      "type": "string"
+    },
+    "status": {
+      "type": "string",
+      "enum": ["PENDING", "NEW", "PICKUP", "PSIP", "LOAD", "TERM", "POD"]
+    },
+    "priority": {
+      "type": "string",
+      "enum": ["NORMAL", "URGENT"]
+    },
+    "customer": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 100
+    },
+    "cityFrom": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 100
+    },
+    "cityTo": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 100
+    },
+    "created": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "assignedDriver": {
+      "type": ["string", "null"]
+    }
+  },
+  "required": [
+    "orderId",
+    "status",
+    "priority",
+    "customer",
+    "cityFrom",
+    "cityTo",
+    "created"
+  ]
+}

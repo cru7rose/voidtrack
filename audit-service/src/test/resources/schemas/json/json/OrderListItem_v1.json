@@ -1,0 +1,17 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "OrderListItemDto",
+  "description": "Podsumowanie zlecenia (lista)",
+  "type": "object",
+  "properties": {
+    "orderId": { "type": "string" },
+    "status": { "type": "string" },
+    "priority": { "type": "string" },
+    "customer": { "type": "string" },
+    "cityFrom": { "type": "string" },
+    "cityTo": { "type": "string" },
+    "created": { "type": "string", "format": "date-time" },
+    "assignedDriver": { "type": "string" }
+  },
+  "required": ["orderId", "status", "priority", "customer", "cityFrom", "cityTo", "created"]
+}

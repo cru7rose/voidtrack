@@ -1,0 +1,16 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "AuditEventDto",
+  "description": "Zdarzenie audytowe w systemie OMS",
+  "type": "object",
+  "properties": {
+    "id": { "type": "string" },
+    "entityType": { "type": "string" },
+    "entityId": { "type": "string" },
+    "action": { "type": "string" },
+    "userId": { "type": "string" },
+    "timestamp": { "type": "string", "format": "date-time" },
+    "details": { "type": "string" }
+  },
+  "required": ["id", "entityType", "entityId", "action", "userId", "timestamp", "details"]
+}

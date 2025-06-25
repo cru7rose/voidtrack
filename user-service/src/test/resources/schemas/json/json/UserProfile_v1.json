@@ -1,0 +1,14 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "urn:projekt:user:profile:v1",
+  "title": "User Profile",
+  "description": "Publiczny profil użytkownika",
+  "type": "object",
+  "properties": {
+    "id": { "type": "string" },
+    "username": { "type": "string" },
+    "role": { "type": "string" },
+    "active": { "type": "boolean" }
+  },
+  "required": ["id", "username", "role", "active"]
+}

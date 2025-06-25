@@ -1,0 +1,45 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "urn:projekt:order:event:v1",
+  "title": "Order Event",
+  "description": "Zdarzenie dotyczące zmiany w zamówieniu, np. zmiana statusu.",
+  "type": "object",
+  "properties": {
+    "eventId": {
+      "type": "string",
+      "description": "Unikalny identyfikator zdarzenia."
+    },
+    "orderId": {
+      "type": "string",
+      "description": "Identyfikator zamówienia, którego dotyczy zdarzenie."
+    },
+    "type": {
+      "type": "string",
+      "description": "Typ zdarzenia, np. 'STATUS_CHANGE'."
+    },
+    "statusFrom": {
+      "type": "string",
+      "description": "Status zamówienia przed zmianą."
+    },
+    "statusTo": {
+      "type": "string",
+      "description": "Status zamówienia po zmianie."
+    },
+    "timestamp": {
+      "type": "string",
+      "format": "date-time",
+      "description": "Znacznik czasowy wystąpienia zdarzenia."
+    },
+    "userId": {
+      "type": "string",
+      "description": "Identyfikator użytkownika, który zainicjował zdarzenie."
+    }
+  },
+  "required": [
+    "eventId",
+    "orderId",
+    "type",
+    "statusTo",
+    "timestamp"
+  ]
+}

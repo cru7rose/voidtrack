@@ -1,0 +1,10 @@
+{
+  "orderId": "a1b2c3d4-e5f6-7890-1234-567890abcdef",
+  "status": "PICKUP",
+  "priority": "URGENT",
+  "customer": "DANXILS Sp. z o.o.",
+  "pickupCity": "Warszawa",
+  "deliveryCity": "Poznań",
+  "created": "2024-06-10T07:30:00Z",
+  "assignedDriver": "john_doe"
+}

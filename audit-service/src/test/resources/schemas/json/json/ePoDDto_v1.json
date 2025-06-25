@@ -1,0 +1,15 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "ePoDDto",
+  "description": "Elektroniczne potwierdzenie dostawy",
+  "type": "object",
+  "properties": {
+    "id": { "type": "string" },
+    "orderId": { "type": "string" },
+    "signature": { "type": "string" },
+    "photos": { "type": "array", "items": { "type": "string" } },
+    "timestamp": { "type": "string", "format": "date-time" },
+    "userId": { "type": "string" }
+  },
+  "required": ["id", "orderId", "signature", "timestamp", "userId"]
+}

@@ -1,0 +1,13 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "urn:projekt:order:confirm:response:v1",
+  "title": "Order Confirmation Response",
+  "description": "Potwierdzenie utworzenia zamówienia transportowego (pełna produkcyjna struktura)",
+  "type": "object",
+  "properties": {
+    "orderId": { "type": "string", "format": "uuid" },
+    "confirmationStatus": { "type": "string", "enum": ["CONFIRMED", "REJECTED"] },
+    "message": { "type": "string" }
+  },
+  "required": ["orderId", "confirmationStatus"]
+}

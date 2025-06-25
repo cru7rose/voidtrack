@@ -1,0 +1,32 @@
+version: '3.8'
+services:
+  order-service:
+    build: ./order-service
+    ports:
+      - "8081:8080"
+    environment:
+      - SPRING_PROFILES_ACTIVE=dev
+    depends_on: []
+  user-service:
+    build: ./user-service
+    ports:
+      - "8082:8080"
+    environment:
+      - SPRING_PROFILES_ACTIVE=dev
+    depends_on: []
+  audit-service:
+    build: ./audit-service
+    ports:
+      - "8083:8080"
+    environment:
+      - SPRING_PROFILES_ACTIVE=dev
+    depends_on: []
+  # Add a database service if needed, e.g. PostgreSQL
+  # db:
+  #   image: postgres:15
+  #   ports:
+  #     - "5432:5432"
+  #   environment:
+  #     POSTGRES_USER: voidtracker
+  #     POSTGRES_PASSWORD: voidtracker
+  #     POSTGRES_DB: voidtracker

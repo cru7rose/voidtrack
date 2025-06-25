@@ -1,0 +1,27 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "OrderDto",
+  "description": "Szczegóły zlecenia transportowego (OMS/TMS)",
+  "type": "object",
+  "properties": {
+    "orderId": { "type": "string" },
+    "status": { "type": "string" },
+    "priority": { "type": "string" },
+    "pickup": { "type": "object" },
+    "delivery": { "type": "object" },
+    "package": { "type": "object" },
+    "timestamps": { "type": "object" },
+    "assignedDriver": { "type": "string" },
+    "epod": { "type": "array" },
+    "deleted": {
+      "type": "boolean",
+      "description": "Soft-delete flag"
+    },
+    "deletedAt": {
+      "type": "string",
+      "format": "date-time",
+      "description": "Timestamp of soft-delete"
+    }
+  },
+  "required": ["orderId", "status", "priority", "pickup", "delivery", "package", "timestamps"]
+}

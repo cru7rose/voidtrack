@@ -10,7 +10,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 
-@SpringBootTest
+@SpringBootTest(classes = com.voidtracker.oms.order.OrderServiceApplication.class)
 @AutoConfigureMockMvc
 class HealthControllerTest {
     @Autowired

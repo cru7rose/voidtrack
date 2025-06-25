@@ -1,0 +1,264 @@
+openapi: 3.0.3
+info:
+  title: Order API
+  version: 1.0.0
+  description: API do zarządzania zleceniami transportowymi
+servers:
+  - url: /api/orders
+paths:
+  /:
+    get:
+      summary: Pobierz listę zleceń
+      responses:
+        '200':
+          description: Lista zleceń
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/OrderDto'
+              examples:
+                example:
+                  value:
+                    - orderId: "a1b2c3d4-e5f6-7890-1234-567890abcdef"
+                      status: "PICKUP"
+                      priority: "URGENT"
+                      customer: "DANXILS Sp. z o.o."
+                      cityFrom: "Warszawa"
+                      cityTo: "Poznań"
+                      created: "2024-06-10T07:30:00Z"
+                      assignedDriver: "john_doe"
+    post:
+      summary: Utwórz nowe zlecenie
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateOrderRequestDto'
+            examples:
+              example:
+                value:
+                  customer: "DANXILS Sp. z o.o."
+                  priority: "URGENT"
+                  pickupAddress: "Logistyczna 12A, Warszawa"
+                  deliveryAddress: "Przemysłowa 1, Poznań"
+                  serviceType: "express"
+                  weight: 15.5
+                  volume: 0.12
+                  colli: 2
+                  requestedDate: "2024-06-10"
+                  note: "Załadunek na rampie 3"
+      responses:
+        '201':
+          description: Zlecenie utworzone
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OrderConfirmationResponseDto'
+        '400':
+          description: Błąd walidacji
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorDto'
+              examples:
+                error:
+                  value:
+                    errorCode: "ORDER_VALIDATION_ERROR"
+                    message: "Nieprawidłowe dane zlecenia."
+                    details: "Pole 'pickupAddress' jest wymagane."
+  /{orderId}:
+    get:
+      summary: Pobierz szczegóły zlecenia
+      parameters:
+        - in: path
+          name: orderId
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Szczegóły zlecenia
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OrderDto'
+        '404':
+          description: Nie znaleziono zlecenia
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorDto'
+              examples:
+                error:
+                  value:
+                    errorCode: "ORDER_NOT_FOUND"
+                    message: "Nie znaleziono zlecenia o podanym ID."
+                    details: "orderId: a1b2c3d4-e5f6-7890-1234-567890abcdef"
+    put:
+      summary: Zaktualizuj zlecenie
+      parameters:
+        - in: path
+          name: orderId
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/OrderDto'
+      responses:
+        '200':
+          description: Zlecenie zaktualizowane
+        '400':
+          description: Błąd walidacji
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorDto'
+    delete:
+      summary: Usuń zlecenie
+      parameters:
+        - in: path
+          name: orderId
+          required: true
+          schema:
+            type: string
+      responses:
+        '204':
+          description: Zlecenie usunięte
+        '404':
+          description: Nie znaleziono zlecenia
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorDto'
+    patch:
+      summary: Zmień status zlecenia
+      parameters:
+        - in: path
+          name: orderId
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                status:
+                  type: string
+              required:
+                - status
+            examples:
+              example:
+                value:
+                  status: "LOAD"
+      responses:
+        '200':
+          description: Historia statusów po zmianie
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OrderStatusHistoryDto'
+              examples:
+                example:
+                  value:
+                    orderId: "a1b2c3d4-e5f6-7890-1234-567890abcdef"
+                    history:
+                      - status: "PENDING"
+                        timestamp: "2024-06-10T07:30:00Z"
+                      - status: "NEW"
+                        timestamp: "2024-06-10T07:35:00Z"
+                      - status: "LOAD"
+                        timestamp: "2024-06-10T08:10:00Z"
+        '400':
+          description: Błąd walidacji
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorDto'
+  /products:
+    get:
+      summary: Pobierz listę produktów
+      responses:
+        '200':
+          description: Lista produktów
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ProductDetailsDto'
+              examples:
+                example:
+                  value:
+                    - productId: "prod-123"
+                      name: "Tarcza hamulcowa"
+                      description: "Tarcza hamulcowa do pojazdu ciężarowego"
+                      weight: 12.5
+                      volume: 0.03
+                      price: 250.00
+                      currency: "PLN"
+  /audit:
+    get:
+      summary: Pobierz listę audytów
+      security:
+        - OAuth2: [admin]
+      responses:
+        '200':
+          description: Lista audytów
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/AuditDto'
+  /health:
+    get:
+      summary: Sprawdź stan usługi
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                example:
+                  status: "UP"
+components:
+  schemas:
+    OrderDto:
+      $ref: '../schemas/json/json/OrderDto_v1.json'
+    ApiErrorDto:
+      $ref: '../schemas/json/json/ApiError_v1.json'
+    OrderConfirmationResponseDto:
+      $ref: '../schemas/json/json/OrderConfirmationResponse_v1.json'
+    CreateOrderRequestDto:
+      $ref: '../schemas/json/json/CreateOrderRequest_v1.json'
+    AuditDto:
+      $ref: '../schemas/json/json/AuditEvent_v1.json'
+    ProductDetailsDto:
+      $ref: '../schemas/json/json/ProductDetails_v1.json'
+    OrderStatusHistoryDto:
+      $ref: '../schemas/json/json/OrderStatusHistory_v1.json'
+security:
+  - OAuth2: []
+securitySchemes:
+  OAuth2:
+    type: oauth2
+    flows:
+      password:
+        tokenUrl: /auth/token
+        scopes:
+          admin: pełny dostęp do audytów
+          user: dostęp do własnych zleceń

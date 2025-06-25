@@ -1,0 +1,31 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Route",
+  "type": "object",
+  "properties": {
+    "routeId": { "type": "string" },
+    "orderId": { "type": "string" },
+    "vehicleId": { "type": "string" },
+    "driverId": { "type": "string" },
+    "status": { "type": "string", "enum": ["planned", "in_progress", "completed", "cancelled"] },
+    "stops": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "stopId": { "type": "string" },
+          "address": { "type": "string" },
+          "eta": { "type": "string", "format": "date-time" },
+          "actualArrival": { "type": "string", "format": "date-time" },
+          "actualDeparture": { "type": "string", "format": "date-time" }
+        },
+        "required": ["stopId", "address"]
+      }
+    },
+    "plannedStart": { "type": "string", "format": "date-time" },
+    "plannedEnd": { "type": "string", "format": "date-time" },
+    "createdAt": { "type": "string", "format": "date-time" },
+    "updatedAt": { "type": "string", "format": "date-time" }
+  },
+  "required": ["routeId", "orderId", "vehicleId", "status", "stops", "plannedStart", "plannedEnd", "createdAt"]
+}
