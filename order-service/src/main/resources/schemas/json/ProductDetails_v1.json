@@ -1,0 +1,33 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "urn:projekt:product:details:v1",
+  "title": "Product Details",
+  "type": "object",
+  "properties": {
+    "productId": {
+      "type": "string"
+    },
+    "name": {
+      "type": "string"
+    },
+    "description": {
+      "type": "string"
+    },
+    "weight": {
+      "type": "number"
+    },
+    "volume": {
+      "type": "number"
+    },
+    "price": {
+      "type": "number"
+    },
+    "currency": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "productId",
+    "name"
+  ]
+}

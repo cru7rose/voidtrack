@@ -1,44 +1,31 @@
 package com.voidtracker.oms.commons.validation;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.networknt.schema.JsonSchema;
-import com.networknt.schema.JsonSchemaFactory;
-import com.networknt.schema.SpecVersion;
-import com.networknt.schema.ValidationMessage;
+import org.everit.json.schema.Schema;
+import org.everit.json.schema.loader.SchemaLoader;
+import org.json.JSONObject;
+import org.json.JSONTokener;
 import org.springframework.stereotype.Component;
-
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.Set;
 
 @Component
 public class JsonSchemaValidator {
 
-    private final ObjectMapper objectMapper = new ObjectMapper();
-    private final JsonSchemaFactory factory = JsonSchemaFactory.getInstance(SpecVersion.VersionFlag.V7);
-
     /**
-     * Waliduje obiekt JSON (w formie Stringa) względem schematu.
+     * Waliduje obiekt JSON (w formie Stringa) względem schematu (również w formie Stringa).
+     * Zgodne z dokumentacją biblioteki Everit JSON Schema.
      *
      * @param jsonContent String zawierający JSON do walidacji.
-     * @param schemaStream InputStream do pliku ze schematem JSON.
-     * @throws IOException jeśli wystąpi błąd odczytu JSON.
-     * @throws IllegalArgumentException jeśli walidacja się nie powiedzie.
+     * @param schemaContent String zawierający schemat JSON.
+     * @throws org.everit.json.schema.ValidationException jeśli walidacja się nie powiedzie.
      */
-    public void validate(String jsonContent, InputStream schemaStream) throws IOException {
-        if (schemaStream == null) {
-            throw new IllegalArgumentException("Schema stream cannot be null. Check if the schema file exists on the classpath.");
-        }
+    public void validate(String jsonContent, String schemaContent) {
+        // Krok 1: Wczytaj schemat ze Stringa
+        JSONObject rawSchema = new JSONObject(new JSONTokener(schemaContent));
+        Schema schema = SchemaLoader.load(rawSchema);
 
-        JsonSchema schema = factory.getSchema(schemaStream);
-        JsonNode jsonNode = objectMapper.readTree(jsonContent);
+        // Krok 2: Wczytaj dane JSON do walidacji ze Stringa
+        JSONObject subject = new JSONObject(new JSONTokener(jsonContent));
 
-        Set<ValidationMessage> errors = schema.validate(jsonNode);
-
-        if (!errors.isEmpty()) {
-            // Rzucamy wyjątek z informacjami o błędach walidacji
-            throw new IllegalArgumentException("JSON validation failed: " + errors);
-        }
+        // Krok 3: Wykonaj walidację. Jeśli dane są nieprawidłowe, metoda rzuci ValidationException.
+        schema.validate(subject);
     }
 }

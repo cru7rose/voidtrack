@@ -214,7 +214,6 @@
 ./user-service/src/main/java/com/voidtracker/oms/user/repository/UserRepository.java
 ./user-service/src/main/java/com/voidtracker/oms/user/service/UserService.java
 ./user-service/src/main/java/com/voidtracker/oms/user/UserServiceApplication.java
-./user-service/src/main/java/com/voidtracker/oms/user/validation/JsonSchemaValidator.java
 ./user-service/src/main/resources/application.properties
 ./user-service/src/test/java/com/voidtracker/oms/user/controller/UserControllerContractIT.java
 ./user-service/src/test/java/com/voidtracker/oms/user/controller/UserControllerSchemaValidationTest.java
@@ -289,39 +288,21 @@
 
 
 --- Plik: ./audit-service/pom.xml ---
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
+
     <parent>
         <groupId>com.voidtracker.oms</groupId>
         <artifactId>voidtracker-parent</artifactId>
         <version>1.0.0-SNAPSHOT</version>
-        <relativePath>../pom.xml</relativePath>
     </parent>
+
     <artifactId>audit-service</artifactId>
-    <name>Audit Service</name>
-    <description>Audit logging microservice</description>
+
     <dependencies>
-        <dependency>
-            <groupId>jakarta.validation</groupId>
-            <artifactId>jakarta.validation-api</artifactId>
-            <version>3.0.2</version>
-        </dependency>
-        <dependency>
-            <groupId>org.mapstruct</groupId>
-            <artifactId>mapstruct</artifactId>
-            <version>1.5.5.Final</version>
-        </dependency>
-        <dependency>
-            <groupId>org.mapstruct</groupId>
-            <artifactId>mapstruct-processor</artifactId>
-            <version>1.5.5.Final</version>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-validation</artifactId>
-        </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-web</artifactId>
@@ -331,55 +312,30 @@
             <artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-actuator</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>com.fasterxml.jackson.core</groupId>
-            <artifactId>jackson-databind</artifactId>
-            <version>2.18.3</version>
-        </dependency>
-        <dependency>
-            <groupId>com.fasterxml.jackson.datatype</groupId>
-            <artifactId>jackson-datatype-jsr310</artifactId>
-            <version>2.18.3</version>
-        </dependency>
-        <dependency>
-            <groupId>com.github.erosb</groupId>
-            <artifactId>everit-json-schema</artifactId>
-            <version>1.14.6</version>
-        </dependency>
-        <dependency>
             <groupId>com.voidtracker.oms</groupId>
             <artifactId>voidtracker-commons</artifactId>
-            <version>1.0.0-SNAPSHOT</version>
         </dependency>
         <dependency>
-            <groupId>org.everit.json</groupId>
-            <artifactId>org.everit.json.schema</artifactId>
-            <version>1.5.1</version>
-            <scope>compile</scope>
-            <exclusions>
-                <exclusion>
-                    <groupId>org.json</groupId>
-                    <artifactId>json</artifactId>
-                </exclusion>
-            </exclusions>
+            <groupId>org.projectlombok</groupId>
+            <artifactId>lombok</artifactId>
+            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-test</artifactId>
             <scope>test</scope>
-            <exclusions>
-                <exclusion>
-                    <groupId>commons-logging</groupId>
-                    <artifactId>commons-logging</artifactId>
-                </exclusion>
-            </exclusions>
         </dependency>
     </dependencies>
-</project>
 
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+            </plugin>
+        </plugins>
+    </build>
+</project>
 
 --- Plik: ./audit-service/src/main/java/com/voidtracker/oms/audit/AuditServiceApplication.java ---
 package com.voidtracker.oms.audit;
@@ -391,7 +347,9 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import org.springframework.context.annotation.Bean;
 
-@SpringBootApplication
+@SpringBootApplication(
+        scanBasePackages = {"com.voidtracker.oms.audit", "com.voidtracker.oms.commons"}
+)
 public class AuditServiceApplication {
     public static void main(String[] args) {
         SpringApplication.run(AuditServiceApplication.class, args);
@@ -435,74 +393,72 @@ public class CorsConfig {
 --- Plik: ./audit-service/src/main/java/com/voidtracker/oms/audit/controller/AuditController.java ---
 package com.voidtracker.oms.audit.controller;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.voidtracker.oms.audit.dto.AuditDto;
 import com.voidtracker.oms.audit.service.AuditService;
+import com.voidtracker.oms.commons.dto.ApiErrorDto;
 import com.voidtracker.oms.commons.validation.JsonSchemaValidator;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.everit.json.schema.ValidationException;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.tags.Tag;
-import io.swagger.v3.oas.annotations.responses.ApiResponse;
-import io.swagger.v3.oas.annotations.media.Content;
-import io.swagger.v3.oas.annotations.media.Schema;
-import java.util.*;
+
 import java.nio.charset.StandardCharsets;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/audit")
 @Tag(name = "Audit Events", description = "Audit event logging and query API")
 public class AuditController {
+
     private final AuditService auditService;
     private final JsonSchemaValidator jsonSchemaValidator;
-    private final String auditSchema;
     private final ObjectMapper objectMapper;
+    private final String auditSchema;
 
     public AuditController(AuditService auditService, JsonSchemaValidator jsonSchemaValidator, ObjectMapper objectMapper) throws Exception {
         this.auditService = auditService;
         this.jsonSchemaValidator = jsonSchemaValidator;
         this.objectMapper = objectMapper;
+        // Wczytujemy schemat raz, podczas tworzenia kontrolera
         var resource = new ClassPathResource("schemas/json/Audit_v1.json");
         this.auditSchema = new String(resource.getInputStream().readAllBytes(), StandardCharsets.UTF_8);
     }
 
     @GetMapping
-    @Operation(summary = "List all audit events", responses = {
-        @ApiResponse(responseCode = "200", description = "List of audit events", content = @Content(mediaType = "application/json", schema = @Schema(implementation = AuditDto.class)))
-    })
+    @Operation(summary = "List all audit events")
     public List<AuditDto> listAuditEvents() {
         return auditService.listAuditEvents();
     }
 
     @GetMapping("/{auditId}")
-    @Operation(summary = "Get audit event details", responses = {
-        @ApiResponse(responseCode = "200", description = "Audit event details", content = @Content(mediaType = "application/json", schema = @Schema(implementation = AuditDto.class)))
-    })
+    @Operation(summary = "Get audit event details")
     public AuditDto getAuditEvent(@PathVariable String auditId) {
         return auditService.getAuditEvent(auditId);
     }
 
     @PostMapping
-    @Operation(summary = "Log new audit event", responses = {
-        @ApiResponse(responseCode = "200", description = "Created audit event", content = @Content(mediaType = "application/json", schema = @Schema(implementation = AuditDto.class))),
-        @ApiResponse(responseCode = "400", description = "Validation error", content = @Content(mediaType = "application/json", schema = @Schema(implementation = com.voidtracker.oms.commons.dto.ApiErrorDto.class)))
-    })
-    public ResponseEntity<?> createAuditEvent(@RequestBody String auditDtoJson) throws Exception {
+    @Operation(summary = "Log new audit event")
+    public ResponseEntity<?> createAuditEvent(@RequestBody String auditDtoJson) {
         try {
             jsonSchemaValidator.validate(auditDtoJson, auditSchema);
             AuditDto auditDto = objectMapper.readValue(auditDtoJson, AuditDto.class);
-            return ResponseEntity.status(HttpStatus.CREATED).body(auditService.createAuditEvent(auditDto));
+            AuditDto createdAudit = auditService.createAuditEvent(auditDto);
+            return ResponseEntity.status(HttpStatus.CREATED).body(createdAudit);
         } catch (ValidationException e) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(
-                Map.of("errorCode", "VALIDATION_ERROR", "message", e.getMessage())
-            );
+            String errorDetails = e.getAllMessages().stream().collect(Collectors.joining(", "));
+            ApiErrorDto error = new ApiErrorDto("VALIDATION_ERROR", e.getMessage(), errorDetails);
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(error);
+        } catch (Exception e) {
+            ApiErrorDto error = new ApiErrorDto("REQUEST_ERROR", e.getMessage(), null);
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(error);
         }
     }
 }
-
 
 --- Plik: ./audit-service/src/main/java/com/voidtracker/oms/audit/dto/AuditDto.java ---
 package com.voidtracker.oms.audit.dto;
@@ -1395,34 +1351,42 @@ If you manually switch to a different parent and actually want the inheritance, 
 
 
 --- Plik: ./order-service/pom.xml ---
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
+
     <parent>
         <groupId>com.voidtracker.oms</groupId>
         <artifactId>voidtracker-parent</artifactId>
         <version>1.0.0-SNAPSHOT</version>
-        <relativePath>../pom.xml</relativePath>
     </parent>
+
     <artifactId>order-service</artifactId>
-    <name>Order Service</name>
-    <description>Order management microservice</description>
+
     <dependencies>
         <dependency>
-            <groupId>junit</groupId>
-            <artifactId>junit</artifactId>
-            <version>4.13.2</version>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-web</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.springdoc</groupId>
+            <artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.voidtracker.oms</groupId>
+            <artifactId>voidtracker-commons</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.projectlombok</groupId>
+            <artifactId>lombok</artifactId>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-test</artifactId>
             <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>javax.validation</groupId>
-            <artifactId>validation-api</artifactId>
-            <version>2.0.1.Final</version>
-        </dependency>
-        <dependency>
-            <groupId>jakarta.validation</groupId>
-            <artifactId>jakarta.validation-api</artifactId>
-            <version>3.0.2</version>
         </dependency>
         <dependency>
             <groupId>org.mapstruct</groupId>
@@ -1435,77 +1399,17 @@ If you manually switch to a different parent and actually want the inheritance, 
             <version>1.5.5.Final</version>
             <scope>provided</scope>
         </dependency>
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-validation</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>com.fasterxml.jackson.core</groupId>
-            <artifactId>jackson-databind</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-web</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.springdoc</groupId>
-            <artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-actuator</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.everit.json</groupId>
-            <artifactId>org.everit.json.schema</artifactId>
-            <version>1.5.1</version>
-            <exclusions>
-                <exclusion>
-                    <groupId>org.json</groupId>
-                    <artifactId>json</artifactId>
-                </exclusion>
-            </exclusions>
-        </dependency>
-        <dependency>
-            <groupId>com.voidtracker.oms</groupId>
-            <artifactId>voidtracker-commons</artifactId>
-            <version>1.0.0-SNAPSHOT</version>
-        </dependency>
-        <dependency>
-            <groupId>org.projectlombok</groupId>
-            <artifactId>lombok</artifactId>
-            <scope>provided</scope>
-        </dependency>
-        <!-- JUnit Jupiter (JUnit 5) -->
-        <dependency>
-            <groupId>org.junit.jupiter</groupId>
-            <artifactId>junit-jupiter</artifactId>
-            <version>5.10.0</version>
-            <scope>test</scope>
-        </dependency>
-        <!-- Spring Boot Test -->
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-test</artifactId>
-            <scope>test</scope>
-        </dependency>
-        <!-- AssertJ for fluent assertions -->
-        <dependency>
-            <groupId>org.assertj</groupId>
-            <artifactId>assertj-core</artifactId>
-            <version>3.25.3</version>
-            <scope>test</scope>
-        </dependency>
-        <!-- JSON Schema Validator (if your tests use it) -->
-        <dependency>
-            <groupId>com.networknt</groupId>
-            <artifactId>json-schema-validator</artifactId>
-            <version>1.0.76</version>
-            <scope>test</scope>
-        </dependency>
     </dependencies>
-</project>
 
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+            </plugin>
+        </plugins>
+    </build>
+</project>
 
 --- Plik: ./order-service/src/main/java/com/voidtracker/oms/order/analytics/AnalyticsController.java ---
 package com.voidtracker.oms.order.analytics;
@@ -2486,9 +2390,9 @@ package com.voidtracker.oms.order.dto;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Pattern;
-import javax.validation.constraints.Size;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Pattern;
+import jakarta.validation.constraints.Size;
 
 @Data
 @NoArgsConstructor
@@ -3686,13 +3590,15 @@ package com.voidtracker.oms.order;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
-@SpringBootApplication
+@SpringBootApplication(
+        // Add this line to scan both the local 'order' package and the shared 'commons' package
+        scanBasePackages = {"com.voidtracker.oms.order", "com.voidtracker.oms.commons"}
+)
 public class OrderServiceApplication {
     public static void main(String[] args) {
         SpringApplication.run(OrderServiceApplication.class, args);
     }
 }
-
 
 --- Plik: ./order-service/src/main/java/com/voidtracker/oms/order/portal/PortalController.java ---
 package com.voidtracker.oms.order.portal;
@@ -4490,7 +4396,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 class AllOrderDtoContractTests {
     @Test
     void orderDtoContract() throws Exception {
-        try (var is = getClass().getClassLoader().getResourceAsStream("schemas/example/OrderDto_example.json")) {
+        try (var is = getClass().getClassLoader().getResourceAsStream("schemas/json/example/OrderDto_example.json")) {
             assertNotNull(is, "Example JSON file not found in classpath");
             String exampleJson = new String(is.readAllBytes(), java.nio.charset.StandardCharsets.UTF_8);
             ObjectMapper mapper = new ObjectMapper();
@@ -4513,7 +4419,7 @@ class AllOrderDtoContractTests {
 
     @Test
     void createOrderRequestDtoContract() throws Exception {
-        try (var is = getClass().getClassLoader().getResourceAsStream("schemas/example/CreateOrderRequestDto_example.json")) {
+        try (var is = getClass().getClassLoader().getResourceAsStream("schemas/json/example/CreateOrderRequestDto_example.json")) {
             assertNotNull(is, "Example JSON file not found in classpath");
             String exampleJson = new String(is.readAllBytes(), java.nio.charset.StandardCharsets.UTF_8);
             ObjectMapper mapper = new ObjectMapper();
@@ -4533,7 +4439,7 @@ class AllOrderDtoContractTests {
 
     @Test
     void orderConfirmationResponseDtoContract() throws Exception {
-        try (var is = getClass().getClassLoader().getResourceAsStream("schemas/example/OrderConfirmationResponseDto_example.json")) {
+        try (var is = getClass().getClassLoader().getResourceAsStream("schemas/json/example/OrderConfirmationResponseDto_example.json")) {
             assertNotNull(is, "Example JSON file not found in classpath");
             String exampleJson = new String(is.readAllBytes(), java.nio.charset.StandardCharsets.UTF_8);
             ObjectMapper mapper = new ObjectMapper();
@@ -4551,7 +4457,7 @@ class AllOrderDtoContractTests {
 
     @Test
     void epodDtoContract() throws Exception {
-        try (var is = getClass().getClassLoader().getResourceAsStream("schemas/example/ePoDDto_example.json")) {
+        try (var is = getClass().getClassLoader().getResourceAsStream("schemas/json/example/ePoDDto_example.json")) {
             assertNotNull(is, "Example JSON file not found in classpath");
             String exampleJson = new String(is.readAllBytes(), java.nio.charset.StandardCharsets.UTF_8);
             ObjectMapper mapper = new ObjectMapper();
@@ -4582,7 +4488,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 class CreateOrderRequestDtoContractTest {
     @Test
     void createOrderRequestDtoExampleShouldMatchSchema() throws Exception {
-        try (var is = getClass().getClassLoader().getResourceAsStream("schemas/example/CreateOrderRequestDto_example.json")) {
+        try (var is = getClass().getClassLoader().getResourceAsStream("schemas/json/example/CreateOrderRequestDto_example.json")) {
             assertNotNull(is, "Example JSON file not found in classpath");
             String exampleJson = new String(is.readAllBytes(), java.nio.charset.StandardCharsets.UTF_8);
             ObjectMapper mapper = new ObjectMapper();
@@ -4607,7 +4513,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 class CreateOrderRequestDtoRoundTripTest {
     @Test
     void createOrderRequestDtoShouldSerializeAndDeserializeRoundTrip() throws Exception {
-        try (var is = getClass().getClassLoader().getResourceAsStream("schemas/example/CreateOrderRequestDto_example.json")) {
+        try (var is = getClass().getClassLoader().getResourceAsStream("schemas/json/example/CreateOrderRequestDto_example.json")) {
             assertNotNull(is, "Example JSON file not found in classpath");
             String exampleJson = new String(is.readAllBytes(), java.nio.charset.StandardCharsets.UTF_8);
             ObjectMapper mapper = new ObjectMapper();
@@ -4633,7 +4539,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 class EpodDtoContractTest {
     @Test
     void epodDtoExampleShouldMatchSchema() throws Exception {
-        try (var is = getClass().getClassLoader().getResourceAsStream("schemas/example/ePoDDto_example.json")) {
+        try (var is = getClass().getClassLoader().getResourceAsStream("schemas/json/example/ePoDDto_example.json")) {
             assertNotNull(is, "Example JSON file not found in classpath");
             String exampleJson = new String(is.readAllBytes(), java.nio.charset.StandardCharsets.UTF_8);
             ObjectMapper mapper = new ObjectMapper();
@@ -4658,7 +4564,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 class EpodDtoRoundTripTest {
     @Test
     void epodDtoShouldSerializeAndDeserializeRoundTrip() throws Exception {
-        try (var is = getClass().getClassLoader().getResourceAsStream("schema/example/ePoDDto_example.json")) {
+        try (var is = getClass().getClassLoader().getResourceAsStream("schemas/json/example/ePoDDto_example.json")) {
             assertNotNull(is, "Example JSON file not found in classpath");
             String exampleJson = new String(is.readAllBytes(), java.nio.charset.StandardCharsets.UTF_8);
             ObjectMapper mapper = new ObjectMapper();
@@ -4861,7 +4767,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 class OrderConfirmationResponseDtoContractTest {
     @Test
     void orderConfirmationResponseDtoExampleShouldMatchSchema() throws Exception {
-        try (var is = getClass().getClassLoader().getResourceAsStream("schemas/example/OrderConfirmationResponseDto_example.json")) {
+        try (var is = getClass().getClassLoader().getResourceAsStream("schemas/json/example/OrderConfirmationResponseDto_example.json")) {
             assertNotNull(is, "Example JSON file not found in classpath");
             String exampleJson = new String(is.readAllBytes(), java.nio.charset.StandardCharsets.UTF_8);
             ObjectMapper mapper = new ObjectMapper();
@@ -4885,7 +4791,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 class OrderConfirmationResponseDtoRoundTripTest {
     @Test
     void orderConfirmationResponseDtoShouldSerializeAndDeserializeRoundTrip() throws Exception {
-        try (var is = getClass().getClassLoader().getResourceAsStream("schemas/example/OrderConfirmationResponseDto_example.json")) {
+        try (var is = getClass().getClassLoader().getResourceAsStream("schemas/json/example/OrderConfirmationResponseDto_example.json")) {
             assertNotNull(is, "Example JSON file not found in classpath");
             String exampleJson = new String(is.readAllBytes(), java.nio.charset.StandardCharsets.UTF_8);
             ObjectMapper mapper = new ObjectMapper();
@@ -4910,7 +4816,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 class OrderDtoContractTest {
     @Test
     void orderDtoExampleShouldMatchSchema() throws Exception {
-        try (var is = getClass().getClassLoader().getResourceAsStream("schemas/example/OrderDto_example.json")) {
+        try (var is = getClass().getClassLoader().getResourceAsStream("schemas/json/example/OrderDto_example.json")) {
             assertNotNull(is, "Example JSON file not found in classpath");
             String exampleJson = new String(is.readAllBytes(), java.nio.charset.StandardCharsets.UTF_8);
             ObjectMapper mapper = new ObjectMapper();
@@ -4933,7 +4839,7 @@ import static org.junit.jupiter.api.Assertions.*;
 class OrderDtoExampleValidationTest {
     @Test
     void orderDtoExampleShouldContainAllRequiredFields() throws Exception {
-        try (var is = getClass().getClassLoader().getResourceAsStream("schemas/example/OrderDto_example.json")) {
+        try (var is = getClass().getClassLoader().getResourceAsStream("schemas/json/example/OrderDto_example.json")) {
             assertNotNull(is, "Example JSON file not found in classpath");
             String exampleJson = new String(is.readAllBytes(), java.nio.charset.StandardCharsets.UTF_8);
             assertTrue(exampleJson.contains("orderId"));
@@ -4968,7 +4874,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 class OrderDtoRoundTripTest {
     @Test
     void orderDtoShouldSerializeAndDeserializeRoundTrip() throws Exception {
-        try (var is = getClass().getClassLoader().getResourceAsStream("schemas/example/OrderDto_example.json")) {
+        try (var is = getClass().getClassLoader().getResourceAsStream("schemas/json/example/OrderDto_example.json")) {
             assertNotNull(is, "Example JSON file not found in classpath");
             String exampleJson = new String(is.readAllBytes(), java.nio.charset.StandardCharsets.UTF_8);
             ObjectMapper mapper = new ObjectMapper();
@@ -4986,129 +4892,161 @@ class OrderDtoRoundTripTest {
 package com.voidtracker.oms.order.dto;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.networknt.schema.JsonSchema;
-import com.networknt.schema.JsonSchemaFactory;
-import com.networknt.schema.SpecVersion;
-import com.networknt.schema.ValidationMessage;
-import com.voidtracker.oms.order.dto.OrderEventDto;
+import com.voidtracker.oms.commons.validation.JsonSchemaValidator;
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.core.io.ClassPathResource;
 
 import java.io.InputStream;
-import java.util.Set;
+import java.nio.charset.StandardCharsets;
 
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 
+@SpringBootTest
 public class OrderEventDtoContractTest {
-    private final ObjectMapper objectMapper = new ObjectMapper();
+
+    @Autowired
+    private ObjectMapper objectMapper;
+    @Autowired
+    private JsonSchemaValidator jsonSchemaValidator;
 
     @Test
     void orderEventDtoShouldMatchJsonSchema() throws Exception {
         OrderEventDto event = ExampleOrderEventDtoFactory.createExampleOrderEventDto();
         String json = objectMapper.writeValueAsString(event);
-        InputStream schemaStream = getClass().getResourceAsStream("/schemas/json/OrderEvent_v1.json");
-        JsonSchemaFactory factory = JsonSchemaFactory.getInstance(SpecVersion.VersionFlag.V7);
-        JsonSchema schema = factory.getSchema(schemaStream);
-        Set<ValidationMessage> errors = schema.validate(objectMapper.readTree(json));
-        assertTrue(errors.isEmpty(), "OrderEventDto nie spełnia kontraktu JSON Schema: " + errors);
+
+        // POPRAWKA: Wczytujemy schemat do Stringa przed walidacją
+        String schemaContent;
+        try (InputStream schemaStream = new ClassPathResource("schemas/json/OrderEvent_v1.json").getInputStream()) {
+            schemaContent = new String(schemaStream.readAllBytes(), StandardCharsets.UTF_8);
+        }
+
+        assertDoesNotThrow(() -> {
+            jsonSchemaValidator.validate(json, schemaContent);
+        }, "OrderEventDto powinien być zgodny ze schematem JSON");
     }
 }
-
 
 --- Plik: ./order-service/src/test/java/com/voidtracker/oms/order/dto/OrderListItemDtoContractTest.java ---
 package com.voidtracker.oms.order.dto;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.networknt.schema.JsonSchema;
-import com.networknt.schema.JsonSchemaFactory;
-import com.networknt.schema.SpecVersion;
-import com.networknt.schema.ValidationMessage;
-import com.voidtracker.oms.order.dto.OrderListItemDto;
+import com.voidtracker.oms.commons.validation.JsonSchemaValidator;
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.core.io.ClassPathResource;
 
 import java.io.InputStream;
-import java.util.Set;
+import java.nio.charset.StandardCharsets;
 
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 
+@SpringBootTest
 public class OrderListItemDtoContractTest {
-    private final ObjectMapper objectMapper = new ObjectMapper();
+
+    @Autowired
+    private ObjectMapper objectMapper;
+    @Autowired
+    private JsonSchemaValidator jsonSchemaValidator;
 
     @Test
     void orderListItemDtoShouldMatchJsonSchema() throws Exception {
-        OrderListItemDto item = ExampleOrderListItemDtoFactory.createExampleOrderListItemDto();
-        String json = objectMapper.writeValueAsString(item);
-        InputStream schemaStream = getClass().getResourceAsStream("/schemas/json/OrderListItem_v1.json");
-        JsonSchemaFactory factory = JsonSchemaFactory.getInstance(SpecVersion.VersionFlag.V7);
-        JsonSchema schema = factory.getSchema(schemaStream);
-        Set<ValidationMessage> errors = schema.validate(objectMapper.readTree(json));
-        assertTrue(errors.isEmpty(), "OrderListItemDto nie spełnia kontraktu JSON Schema: " + errors);
+        OrderListItemDto dto = ExampleOrderListItemDtoFactory.createExampleOrderListItemDto();
+        String json = objectMapper.writeValueAsString(dto);
+
+        // POPRAWKA: Wczytujemy schemat do Stringa przed walidacją
+        String schemaContent;
+        try (InputStream schemaStream = new ClassPathResource("schemas/json/OrderListItem_v1.json").getInputStream()) {
+            schemaContent = new String(schemaStream.readAllBytes(), StandardCharsets.UTF_8);
+        }
+
+        assertDoesNotThrow(() -> {
+            jsonSchemaValidator.validate(json, schemaContent);
+        }, "OrderListItemDto powinien być zgodny ze schematem JSON");
     }
 }
-
 
 --- Plik: ./order-service/src/test/java/com/voidtracker/oms/order/dto/OrderStatusHistoryDtoContractTest.java ---
 package com.voidtracker.oms.order.dto;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.networknt.schema.JsonSchema;
-import com.networknt.schema.JsonSchemaFactory;
-import com.networknt.schema.SpecVersion;
-import com.networknt.schema.ValidationMessage;
-import com.voidtracker.oms.order.dto.OrderStatusHistoryDto;
+import com.voidtracker.oms.commons.validation.JsonSchemaValidator;
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.core.io.ClassPathResource;
 
 import java.io.InputStream;
-import java.util.Set;
+import java.nio.charset.StandardCharsets;
 
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 
+@SpringBootTest
 public class OrderStatusHistoryDtoContractTest {
-    private final ObjectMapper objectMapper = new ObjectMapper();
+
+    @Autowired
+    private ObjectMapper objectMapper;
+    @Autowired
+    private JsonSchemaValidator jsonSchemaValidator;
 
     @Test
     void orderStatusHistoryDtoShouldMatchJsonSchema() throws Exception {
-        OrderStatusHistoryDto hist = ExampleOrderStatusHistoryDtoFactory.createExampleOrderStatusHistoryDto();
-        String json = objectMapper.writeValueAsString(hist);
-        InputStream schemaStream = getClass().getResourceAsStream("/schemas/json/OrderStatusHistory_v1.json");
-        JsonSchemaFactory factory = JsonSchemaFactory.getInstance(SpecVersion.VersionFlag.V7);
-        JsonSchema schema = factory.getSchema(schemaStream);
-        Set<ValidationMessage> errors = schema.validate(objectMapper.readTree(json));
-        assertTrue(errors.isEmpty(), "OrderStatusHistoryDto nie spełnia kontraktu JSON Schema: " + errors);
+        OrderStatusHistoryDto dto = ExampleOrderStatusHistoryDtoFactory.createExampleOrderStatusHistoryDto();
+        String json = objectMapper.writeValueAsString(dto);
+
+        // POPRAWKA: Wczytujemy schemat do Stringa przed walidacją
+        String schemaContent;
+        try (InputStream schemaStream = new ClassPathResource("schemas/json/OrderStatusHistory_v1.json").getInputStream()) {
+            schemaContent = new String(schemaStream.readAllBytes(), StandardCharsets.UTF_8);
+        }
+
+        assertDoesNotThrow(() -> {
+            jsonSchemaValidator.validate(json, schemaContent);
+        }, "OrderStatusHistoryDto powinien być zgodny ze schematem JSON");
     }
 }
-
 
 --- Plik: ./order-service/src/test/java/com/voidtracker/oms/order/dto/ProductDetailsDtoContractTest.java ---
 package com.voidtracker.oms.order.dto;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.networknt.schema.JsonSchema;
-import com.networknt.schema.JsonSchemaFactory;
-import com.networknt.schema.SpecVersion;
-import com.networknt.schema.ValidationMessage;
-import com.voidtracker.oms.order.dto.ProductDetailsDto;
+import com.voidtracker.oms.commons.validation.JsonSchemaValidator;
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.core.io.ClassPathResource;
 
 import java.io.InputStream;
-import java.util.Set;
+import java.nio.charset.StandardCharsets;
 
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 
+@SpringBootTest
 public class ProductDetailsDtoContractTest {
-    private final ObjectMapper objectMapper = new ObjectMapper();
+
+    @Autowired
+    private ObjectMapper objectMapper;
+    @Autowired
+    private JsonSchemaValidator jsonSchemaValidator;
 
     @Test
     void productDetailsDtoShouldMatchJsonSchema() throws Exception {
-        ProductDetailsDto product = ExampleProductDetailsDtoFactory.createExampleProductDetailsDto();
-        String json = objectMapper.writeValueAsString(product);
-        InputStream schemaStream = getClass().getResourceAsStream("/schemas/json/ProductDetails_v1.json");
-        JsonSchemaFactory factory = JsonSchemaFactory.getInstance(SpecVersion.VersionFlag.V7);
-        JsonSchema schema = factory.getSchema(schemaStream);
-        Set<ValidationMessage> errors = schema.validate(objectMapper.readTree(json));
-        assertTrue(errors.isEmpty(), "ProductDetailsDto nie spełnia kontraktu JSON Schema: " + errors);
+        ProductDetailsDto dto = ExampleProductDetailsDtoFactory.createExampleProductDetailsDto();
+        String json = objectMapper.writeValueAsString(dto);
+
+        // POPRAWKA: Wczytujemy schemat do Stringa przed walidacją
+        String schemaContent;
+        try (InputStream schemaStream = new ClassPathResource("schemas/json/ProductDetails_v1.json").getInputStream()) {
+            schemaContent = new String(schemaStream.readAllBytes(), StandardCharsets.UTF_8);
+        }
+
+        assertDoesNotThrow(() -> {
+            jsonSchemaValidator.validate(json, schemaContent);
+        }, "ProductDetailsDto powinien być zgodny ze schematem JSON");
     }
 }
-
 
 --- Plik: ./order-service/src/test/java/com/voidtracker/oms/order/dto/ProductDetailsDtoMappingTest.java ---
 package com.voidtracker.oms.order.dto;
@@ -5183,11 +5121,11 @@ class OrderServiceTest {
 
 --- Plik: ./pom.xml ---
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <!-- Dziedziczymy po spring-boot-starter-parent, który zarządza wersjami większości bibliotek. -->
     <parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
@@ -5199,9 +5137,16 @@ class OrderServiceTest {
     <artifactId>voidtracker-parent</artifactId>
     <version>1.0.0-SNAPSHOT</version>
     <packaging>pom</packaging>
-
     <name>VoidTracker :: Parent</name>
-    <description>Nadrzędny projekt POM dla systemu VoidTracker OMS</description>
+    <description>Parent POM for the VoidTracker Order Management System</description>
+
+    <properties>
+        <java.version>17</java.version>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <springdoc-openapi.version>2.5.0</springdoc-openapi.version>
+        <mapstruct.version>1.5.5.Final</mapstruct.version>
+        <everit-json-schema.version>1.14.4</everit-json-schema.version>
+    </properties>
 
     <modules>
         <module>voidtracker-commons</module>
@@ -5210,74 +5155,67 @@ class OrderServiceTest {
         <module>audit-service</module>
     </modules>
 
-    <properties>
-        <java.version>17</java.version>
-        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <springdoc-openapi.version>2.5.0</springdoc-openapi.version>
-    </properties>
-
-    <!--
-      Zarządzamy centralnie tylko wersjami tych zależności,
-      których nie ma w nadrzędnym BOMie Spring Boota.
-    -->
     <dependencyManagement>
         <dependencies>
-            <!-- Nasza wspólna biblioteka -->
+            <dependency>
+                <groupId>org.mapstruct</groupId>
+                <artifactId>mapstruct-processor</artifactId>
+                <version>1.5.5.Final</version>
+                <scope>provided</scope>
+            </dependency>
             <dependency>
                 <groupId>com.voidtracker.oms</groupId>
                 <artifactId>voidtracker-commons</artifactId>
                 <version>${project.version}</version>
             </dependency>
 
-            <!-- Dokumentacja API -->
             <dependency>
                 <groupId>org.springdoc</groupId>
                 <artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>
                 <version>${springdoc-openapi.version}</version>
             </dependency>
             <dependency>
-                <groupId>org.springframework.boot</groupId>
-                <artifactId>spring-boot-starter-test</artifactId>
-                <version>3.4.4</version>
+                <groupId>com.github.erosb</groupId>
+                <artifactId>everit-json-schema</artifactId>
+                <version>${everit-json-schema.version}</version>
             </dependency>
             <dependency>
-                <groupId>org.springframework.boot</groupId>
-                <artifactId>spring-boot-starter-web</artifactId>
-                <version>3.4.4</version>
+                <groupId>org.mapstruct</groupId>
+                <artifactId>mapstruct</artifactId>
+                <version>${mapstruct.version}</version>
             </dependency>
-            <dependency>
-                <groupId>javax.validation</groupId>
-                <artifactId>validation-api</artifactId>
-                <version>2.0.1.Final</version>
-            </dependency>
-
         </dependencies>
-
     </dependencyManagement>
 
     <build>
-        <plugins>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-compiler-plugin</artifactId>
-                <version>3.10.1</version>
-                <configuration>
-                    <source>${java.version}</source>
-                    <target>${java.version}</target>
-                    <annotationProcessorPaths>
-                        <path>
-                            <groupId>org.projectlombok</groupId>
-                            <artifactId>lombok</artifactId>
-                            <version>1.18.30</version>
-                        </path>
-                    </annotationProcessorPaths>
-                </configuration>
-            </plugin>
-        </plugins>
+        <pluginManagement>
+            <plugins>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-compiler-plugin</artifactId>
+                    <version>3.13.0</version>
+                    <configuration>
+                        <source>${java.version}</source>
+                        <target>${java.version}</target>
+                        <annotationProcessorPaths>
+                            <path>
+                                <groupId>org.projectlombok</groupId>
+                                <artifactId>lombok</artifactId>
+                                <version>${lombok.version}</version>
+                            </path>
+                            <path>
+                                <groupId>org.mapstruct</groupId>
+                                <artifactId>mapstruct-processor</artifactId>
+                                <version>${mapstruct.version}</version>
+                            </path>
+                        </annotationProcessorPaths>
+                    </configuration>
+                </plugin>
+            </plugins>
+        </pluginManagement>
     </build>
 
 </project>
-
 
 --- Plik: ./README.md ---
 # VoidTracker OMS - Unified Environment Setup
@@ -5369,50 +5307,27 @@ class VoidtrackerApplicationTests {
 
 
 --- Plik: ./user-service/pom.xml ---
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
+
     <parent>
         <groupId>com.voidtracker.oms</groupId>
         <artifactId>voidtracker-parent</artifactId>
         <version>1.0.0-SNAPSHOT</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
+
     <artifactId>user-service</artifactId>
     <name>User Service</name>
-    <description>User management microservice</description>
+    <description>User profile and role management service</description>
+
     <dependencies>
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-web</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.springdoc</groupId>
-            <artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-actuator</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.everit.json</groupId>
-            <artifactId>org.everit.json.schema</artifactId>
-            <version>1.5.1</version>
-            <exclusions>
-                <exclusion>
-                    <groupId>org.json</groupId>
-                    <artifactId>json</artifactId>
-                </exclusion>
-            </exclusions>
-        </dependency>
-        <dependency>
-            <groupId>com.fasterxml.jackson.core</groupId>
-            <artifactId>jackson-databind</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>com.voidtracker.oms</groupId>
-            <artifactId>voidtracker-commons</artifactId>
-            <version>1.0.0-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>org.projectlombok</groupId>
@@ -5420,41 +5335,24 @@ class VoidtrackerApplicationTests {
             <scope>provided</scope>
         </dependency>
         <dependency>
-            <groupId>junit</groupId>
-            <artifactId>junit</artifactId>
-            <scope>test</scope>
+            <groupId>org.springdoc</groupId>
+            <artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>
         </dependency>
+
         <dependency>
-            <groupId>org.junit.jupiter</groupId>
-            <artifactId>junit-jupiter-api</artifactId>
-            <scope>test</scope>
+            <groupId>com.voidtracker.oms</groupId>
+            <artifactId>voidtracker-commons</artifactId>
+            <version>${project.version}</version>
         </dependency>
-        <dependency>
-            <groupId>org.assertj</groupId>
-            <artifactId>assertj-core</artifactId>
-            <version>3.25.3</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.mockito</groupId>
-            <artifactId>mockito-core</artifactId>
-            <version>5.2.0</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>com.jayway.jsonpath</groupId>
-            <artifactId>json-path</artifactId>
-            <version>2.9.0</version>
-            <scope>test</scope>
-        </dependency>
+
         <dependency>
             <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-test-autoconfigure</artifactId>
+            <artifactId>spring-boot-starter-test</artifactId>
             <scope>test</scope>
         </dependency>
     </dependencies>
-</project>
 
+</project>
 
 --- Plik: ./user-service/src/main/java/com/voidtracker/oms/user/config/CorsConfig.java ---
 package com.voidtracker.oms.user.config;
@@ -5488,50 +5386,53 @@ public class CorsConfig {
 --- Plik: ./user-service/src/main/java/com/voidtracker/oms/user/controller/UserController.java ---
 package com.voidtracker.oms.user.controller;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.voidtracker.oms.commons.dto.ApiErrorDto;
+import com.voidtracker.oms.commons.validation.JsonSchemaValidator;
 import com.voidtracker.oms.user.dto.UserProfileDto;
 import com.voidtracker.oms.user.service.UserService;
-import com.voidtracker.oms.commons.validation.JsonSchemaValidator;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.everit.json.schema.ValidationException;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.tags.Tag;
-import io.swagger.v3.oas.annotations.responses.ApiResponse;
-import io.swagger.v3.oas.annotations.media.Content;
-import io.swagger.v3.oas.annotations.media.Schema;
-import java.util.*;
+
 import java.nio.charset.StandardCharsets;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/users")
 @Tag(name = "User Management", description = "User profile and role management API")
 public class UserController {
+
     private final UserService userService;
     private final JsonSchemaValidator jsonSchemaValidator;
+    private final ObjectMapper objectMapper;
     private final String userProfileSchema;
 
-    public UserController(UserService userService, JsonSchemaValidator jsonSchemaValidator) throws Exception {
+    public UserController(UserService userService, JsonSchemaValidator jsonSchemaValidator, ObjectMapper objectMapper) throws Exception {
         this.userService = userService;
         this.jsonSchemaValidator = jsonSchemaValidator;
-        // Load schema from classpath
+        this.objectMapper = objectMapper;
+        // Wczytujemy schemat raz, podczas tworzenia kontrolera
         var resource = new ClassPathResource("schemas/json/UserProfile_v1.json");
         this.userProfileSchema = new String(resource.getInputStream().readAllBytes(), StandardCharsets.UTF_8);
     }
 
     @GetMapping
-    @Operation(summary = "List all users", responses = {
-        @ApiResponse(responseCode = "200", description = "List of users", content = @Content(mediaType = "application/json", schema = @Schema(implementation = UserProfileDto.class)))
-    })
+    @Operation(summary = "List all users")
     public List<UserProfileDto> listUsers() {
         return userService.listUsers();
     }
 
     @GetMapping("/{id}")
-    @Operation(summary = "Get user details", responses = {
-        @ApiResponse(responseCode = "200", description = "User details", content = @Content(mediaType = "application/json", schema = @Schema(implementation = UserProfileDto.class)))
-    })
+    @Operation(summary = "Get user details")
     public ResponseEntity<UserProfileDto> getUser(@PathVariable String id) {
         UserProfileDto user = userService.getUser(id);
         if (user == null) {
@@ -5541,36 +5442,39 @@ public class UserController {
     }
 
     @PostMapping
-    @Operation(summary = "Create new user", responses = {
-        @ApiResponse(responseCode = "201", description = "Created user", content = @Content(mediaType = "application/json", schema = @Schema(implementation = UserProfileDto.class))),
-        @ApiResponse(responseCode = "400", description = "Validation error", content = @Content(mediaType = "application/json", schema = @Schema(implementation = com.voidtracker.oms.commons.dto.ApiErrorDto.class)))
-    })
-    public ResponseEntity<?> createUser(@RequestBody String userDtoJson) throws Exception {
+    @Operation(summary = "Create new user")
+    public ResponseEntity<?> createUser(@RequestBody String userDtoJson) {
         try {
             jsonSchemaValidator.validate(userDtoJson, userProfileSchema);
-            UserProfileDto userDto = new com.fasterxml.jackson.databind.ObjectMapper().readValue(userDtoJson, UserProfileDto.class);
-            return ResponseEntity.status(HttpStatus.CREATED).body(userService.createUser(userDto));
+            UserProfileDto userDto = objectMapper.readValue(userDtoJson, UserProfileDto.class);
+            UserProfileDto createdUser = userService.createUser(userDto);
+            return ResponseEntity.status(HttpStatus.CREATED).body(createdUser);
         } catch (ValidationException e) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(
-                Map.of("errorCode", "VALIDATION_ERROR", "message", e.getMessage())
-            );
+            // Przechwytujemy specyficzny wyjątek z Everit i tworzymy czytelną odpowiedź
+            String errorDetails = e.getAllMessages().stream().collect(Collectors.joining(", "));
+            ApiErrorDto error = new ApiErrorDto("VALIDATION_ERROR", e.getMessage(), errorDetails);
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(error);
+        } catch (Exception e) {
+            ApiErrorDto error = new ApiErrorDto("REQUEST_ERROR", e.getMessage(), null);
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(error);
         }
     }
 
     @PutMapping("/{id}")
-    @Operation(summary = "Update user", responses = {
-        @ApiResponse(responseCode = "200", description = "Updated user", content = @Content(mediaType = "application/json", schema = @Schema(implementation = UserProfileDto.class))),
-        @ApiResponse(responseCode = "400", description = "Validation error", content = @Content(mediaType = "application/json", schema = @Schema(implementation = com.voidtracker.oms.commons.dto.ApiErrorDto.class)))
-    })
-    public ResponseEntity<?> updateUser(@PathVariable String id, @RequestBody String userDtoJson) throws Exception {
+    @Operation(summary = "Update user")
+    public ResponseEntity<?> updateUser(@PathVariable String id, @RequestBody String userDtoJson) {
         try {
             jsonSchemaValidator.validate(userDtoJson, userProfileSchema);
-            UserProfileDto userDto = new com.fasterxml.jackson.databind.ObjectMapper().readValue(userDtoJson, UserProfileDto.class);
-            return ResponseEntity.ok(userService.updateUser(id, userDto));
+            UserProfileDto userDto = objectMapper.readValue(userDtoJson, UserProfileDto.class);
+            UserProfileDto updatedUser = userService.updateUser(id, userDto);
+            return ResponseEntity.ok(updatedUser);
         } catch (ValidationException e) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(
-                Map.of("errorCode", "VALIDATION_ERROR", "message", e.getMessage())
-            );
+            String errorDetails = e.getAllMessages().stream().collect(Collectors.joining(", "));
+            ApiErrorDto error = new ApiErrorDto("VALIDATION_ERROR", e.getMessage(), errorDetails);
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(error);
+        } catch (Exception e) {
+            ApiErrorDto error = new ApiErrorDto("REQUEST_ERROR", e.getMessage(), null);
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(error);
         }
     }
 
@@ -5581,7 +5485,6 @@ public class UserController {
         return ResponseEntity.noContent().build();
     }
 }
-
 
 --- Plik: ./user-service/src/main/java/com/voidtracker/oms/user/dto/UserDto.java ---
 package com.voidtracker.oms.user.dto;
@@ -5746,29 +5649,12 @@ package com.voidtracker.oms.user;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
-@SpringBootApplication
+@SpringBootApplication(
+        scanBasePackages = {"com.voidtracker.oms.user", "com.voidtracker.oms.commons"}
+)
 public class UserServiceApplication {
     public static void main(String[] args) {
         SpringApplication.run(UserServiceApplication.class, args);
-    }
-}
-
-
---- Plik: ./user-service/src/main/java/com/voidtracker/oms/user/validation/JsonSchemaValidator.java ---
-package com.voidtracker.oms.user.validation;
-
-import org.everit.json.schema.loader.SchemaLoader;
-import org.everit.json.schema.Schema;
-import org.json.JSONObject;
-import org.json.JSONTokener;
-import org.springframework.stereotype.Component;
-
-@Component
-public class JsonSchemaValidator {
-    public void validate(String json, String schemaContent) {
-        JSONObject rawSchema = new JSONObject(new JSONTokener(schemaContent));
-        Schema schema = SchemaLoader.load(rawSchema);
-        schema.validate(new JSONObject(json)); // throws ValidationException if invalid
     }
 }
 
@@ -6125,7 +6011,6 @@ class UserServiceApplicationTests {
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-
     <parent>
         <groupId>com.voidtracker.oms</groupId>
         <artifactId>voidtracker-parent</artifactId>
@@ -6133,16 +6018,22 @@ class UserServiceApplicationTests {
         <relativePath>../pom.xml</relativePath>
     </parent>
 
-
     <artifactId>voidtracker-commons</artifactId>
     <name>VoidTracker :: Commons</name>
-    <description>Współdzielone klasy (DTO, Enums, Utils) dla mikroserwisów OMS</description>
+    <description>Shared classes (DTO, Enums, Utils) for OMS microservices</description>
 
     <dependencies>
         <dependency>
-            <groupId>org.everit.json</groupId>
-            <artifactId>org.everit.json.schema</artifactId>
-            <version>1.5.1</version>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-web</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.github.erosb</groupId>
+            <artifactId>everit-json-schema</artifactId>
         </dependency>
         <dependency>
             <groupId>org.projectlombok</groupId>
@@ -6150,56 +6041,17 @@ class UserServiceApplicationTests {
             <scope>provided</scope>
         </dependency>
         <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-web</artifactId>
-        </dependency>
-        <dependency>
             <groupId>jakarta.validation</groupId>
             <artifactId>jakarta.validation-api</artifactId>
-            <version>3.0.2</version>
         </dependency>
         <dependency>
             <groupId>org.junit.jupiter</groupId>
             <artifactId>junit-jupiter</artifactId>
-            <version>5.10.0</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>com.networknt</groupId>
-            <artifactId>json-schema-validator</artifactId>
-            <version>1.0.76</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>com.fasterxml.jackson.core</groupId>
-            <artifactId>jackson-databind</artifactId>
-            <version>2.15.2</version>
             <scope>test</scope>
         </dependency>
     </dependencies>
 
-    <build>
-        <plugins>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-compiler-plugin</artifactId>
-                <version>3.10.1</version>
-                <configuration>
-                    <source>17</source>
-                    <target>17</target>
-                    <annotationProcessorPaths>
-                        <path>
-                            <groupId>org.projectlombok</groupId>
-                            <artifactId>lombok</artifactId>
-                            <version>1.18.30</version>
-                        </path>
-                    </annotationProcessorPaths>
-                </configuration>
-            </plugin>
-        </plugins>
-    </build>
 </project>
-
 
 --- Plik: ./voidtracker-commons/src/main/java/com/voidtracker/oms/commons/dto/ApiErrorDto.java ---
 package com.voidtracker.oms.commons.dto;
@@ -6276,21 +6128,35 @@ public class RestExceptionHandler {
 --- Plik: ./voidtracker-commons/src/main/java/com/voidtracker/oms/commons/validation/JsonSchemaValidator.java ---
 package com.voidtracker.oms.commons.validation;
 
-import org.everit.json.schema.loader.SchemaLoader;
 import org.everit.json.schema.Schema;
+import org.everit.json.schema.loader.SchemaLoader;
 import org.json.JSONObject;
 import org.json.JSONTokener;
 import org.springframework.stereotype.Component;
 
 @Component
 public class JsonSchemaValidator {
-    public void validate(String json, String schemaContent) {
+
+    /**
+     * Waliduje obiekt JSON (w formie Stringa) względem schematu (również w formie Stringa).
+     * Zgodne z dokumentacją biblioteki Everit JSON Schema.
+     *
+     * @param jsonContent String zawierający JSON do walidacji.
+     * @param schemaContent String zawierający schemat JSON.
+     * @throws org.everit.json.schema.ValidationException jeśli walidacja się nie powiedzie.
+     */
+    public void validate(String jsonContent, String schemaContent) {
+        // Krok 1: Wczytaj schemat ze Stringa
         JSONObject rawSchema = new JSONObject(new JSONTokener(schemaContent));
         Schema schema = SchemaLoader.load(rawSchema);
-        schema.validate(new JSONObject(json)); // throws ValidationException if invalid
+
+        // Krok 2: Wczytaj dane JSON do walidacji ze Stringa
+        JSONObject subject = new JSONObject(new JSONTokener(jsonContent));
+
+        // Krok 3: Wykonaj walidację. Jeśli dane są nieprawidłowe, metoda rzuci ValidationException.
+        schema.validate(subject);
     }
 }
-
 
 --- Plik: ./voidtracker-commons/src/main/resources/application.properties ---
 spring.application.name=voidtracker-commons

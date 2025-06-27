@@ -1,29 +1,38 @@
 package com.voidtracker.oms.order.dto;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.networknt.schema.JsonSchema;
-import com.networknt.schema.JsonSchemaFactory;
-import com.networknt.schema.SpecVersion;
-import com.networknt.schema.ValidationMessage;
-import com.voidtracker.oms.order.dto.OrderListItemDto;
+import com.voidtracker.oms.commons.validation.JsonSchemaValidator;
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.core.io.ClassPathResource;
 
 import java.io.InputStream;
-import java.util.Set;
+import java.nio.charset.StandardCharsets;
 
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 
+@SpringBootTest
 public class OrderListItemDtoContractTest {
-    private final ObjectMapper objectMapper = new ObjectMapper();
+
+    @Autowired
+    private ObjectMapper objectMapper;
+    @Autowired
+    private JsonSchemaValidator jsonSchemaValidator;
 
     @Test
     void orderListItemDtoShouldMatchJsonSchema() throws Exception {
-        OrderListItemDto item = ExampleOrderListItemDtoFactory.createExampleOrderListItemDto();
-        String json = objectMapper.writeValueAsString(item);
-        InputStream schemaStream = getClass().getResourceAsStream("/schemas/json/OrderListItem_v1.json");
-        JsonSchemaFactory factory = JsonSchemaFactory.getInstance(SpecVersion.VersionFlag.V7);
-        JsonSchema schema = factory.getSchema(schemaStream);
-        Set<ValidationMessage> errors = schema.validate(objectMapper.readTree(json));
-        assertTrue(errors.isEmpty(), "OrderListItemDto nie spełnia kontraktu JSON Schema: " + errors);
+        OrderListItemDto dto = ExampleOrderListItemDtoFactory.createExampleOrderListItemDto();
+        String json = objectMapper.writeValueAsString(dto);
+
+        // POPRAWKA: Wczytujemy schemat do Stringa przed walidacją
+        String schemaContent;
+        try (InputStream schemaStream = new ClassPathResource("schemas/json/OrderListItem_v1.json").getInputStream()) {
+            schemaContent = new String(schemaStream.readAllBytes(), StandardCharsets.UTF_8);
+        }
+
+        assertDoesNotThrow(() -> {
+            jsonSchemaValidator.validate(json, schemaContent);
+        }, "OrderListItemDto powinien być zgodny ze schematem JSON");
     }
 }
